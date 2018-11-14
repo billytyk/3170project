@@ -21,16 +21,26 @@ import java.util.Scanner;
 // pr
 
 public class project {
-  public static void main(String[] args) {
-      System.out.println("Welcome! Who are you?");
-      System.out.println("1. An administrator");
-      System.out.println("2. A passenger");
-      System.out.println("3. A driver");
-      System.out.println("4. None of the above");
-      System.out.println("Please enter [1-4].");
-      Administrator.list();
+    public static void main(String[] args) {
+        Integer get_identity = Riding_System.Welcome_list();
 
-  }
+        //Administrator.list();
+    }
+}
+
+class Riding_System {
+    public static Integer Welcome_list(){
+        System.out.println("Welcome! Who are you?");
+        System.out.println("1. An administrator");
+        System.out.println("2. A passenger");
+        System.out.println("3. A driver");
+        System.out.println("4. None of the above");
+        System.out.println("Please enter [1-4].");
+        Scanner scanner = new Scanner(System.in);
+        Integer input = scanner.nextInt();
+        System.out.format("Your input is %d %n", input);
+        return input;
+    }
 }
 class Administrator{
     public static void list(){
@@ -43,7 +53,7 @@ class Administrator{
     System.out.println("Please enter [1-5].");
     Scanner scanner = new Scanner(System.in);
     String input = scanner.nextLine();
-    scanner.close();
+    //scanner.close();
       switch (input){
         case "1":   Administrator.Create_Table();
                     break;
@@ -59,26 +69,26 @@ class Administrator{
     }
     public static void Create_Table() {
 
-        list();
+        Administrator.list();
     }
     public static void Delete_Table() {
 
-        list();
+        Administrator.list();
     }
     public static void Load_data() {
 
-        list();
+        Administrator.list();
     }
     public static void Check_data() {
 
-        list();
+        Administrator.list();
     }
     public static void Go_back() {
 
-        list();
+        Administrator.list();
     }
 }
-class passenger{
+class Passenger{
     public static void list(){
     System.out.println("Passenger, what would you like to do?");
     System.out.println("1. Request a ride");
@@ -90,13 +100,13 @@ class passenger{
     String input = scanner.nextLine();
     scanner.close();
       switch (input){
-        case "1": passenger.Request_ride();
+        case "1": Passenger.Request_ride();
                   break;
-        case "2": passenger.Check_records();
+        case "2": Passenger.Check_records();
                   break;
-        case "3": passenger.Rate_trip();
+        case "3": Passenger.Rate_trip();
                   break;
-        case "4": passenger.Go_back();
+        case "4": Passenger.Go_back();
                   break;
       }
     }
@@ -117,7 +127,7 @@ class passenger{
         list();
     }
 }
-class driver{
+class Driver{
     public static void list(){
     System.out.println("Driver, what would you like to do?");
     System.out.println("1. Take a request");
@@ -129,13 +139,13 @@ class driver{
     String input = scanner.nextLine();
     scanner.close();
       switch (input){
-        case "1": driver.Take_request();
+        case "1": Driver.Take_request();
                   break;
-        case "2": driver.Finish_trip();
+        case "2": Driver.Finish_trip();
                   break;
-        case "3": driver.Check_rating();
+        case "3": Driver.Check_rating();
                   break;
-        case "4": driver.Go_back();
+        case "4": Driver.Go_back();
                   break;
       }
     }
