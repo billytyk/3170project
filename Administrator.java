@@ -72,8 +72,9 @@ public class Administrator{
             try{
 
                 Statement stmt = con.createStatement();
-                sql = new Scanner(new File("DROP_TABLE.sql")).useDelimiter("\\Z").next();
-                System.out.println(sql);
+                sql = new Scanner(new File("CREATE_TABLE.sql")).useDelimiter("\\Z").next();
+                //System.out.println(sql);
+                //ResultSet rs = stmt.executeQuery(sql);
 
             }
             catch(FileNotFoundException e){
