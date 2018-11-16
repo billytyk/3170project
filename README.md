@@ -12,5 +12,5 @@ $ git push
 
 ```
 javac project.java
-java project
+java -classpath '.;.\classes\mysql-connector-java-5.1.47\*' project
 ```

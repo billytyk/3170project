@@ -1,8 +1,14 @@
+//import java.beans.Statement;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.lang.*;
 import java.util.Scanner;
+import java.sql.*;
 
-class Administrator{
 
+public class Administrator{
+    
+    //method
     public static void list(){
 
         Integer input = 0;
@@ -55,6 +61,38 @@ class Administrator{
     public static void Create_Table() {
 
         System.out.println("Create_Table");
+        Database db = new Database();
+        String sql = "";
+        Connection con = db.getConnection();
+
+        if(con != null){
+
+            System.out.println("Database connected");
+
+            try{
+
+                Statement stmt = con.createStatement();
+                sql = new Scanner(new File("DROP_TABLE.sql")).useDelimiter("\\Z").next();
+                System.out.println(sql);
+
+            }
+            catch(FileNotFoundException e){
+
+                System.out.println(e);
+
+            }
+            catch(SQLException e){
+
+                System.out.println(e);
+
+            }
+
+        }
+        else{
+
+            System.out.println("Cannot connect to db");
+        }
+        
         System.exit(0);
     }
     public static void Delete_Table() {
