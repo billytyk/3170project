@@ -8,6 +8,11 @@ $ git add <FILE>
 $ git commit -m "commit message"
 $ git push
 ```
+
+## Before you compile the code:
+unzip test_data.zip to folder
+
+
 ## How to compile java code:
 
 ```
