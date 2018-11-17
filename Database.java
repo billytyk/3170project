@@ -33,5 +33,14 @@ public class Database{
         return connection;
     }
 
+    public void CloseConnection(Connection con){
+        try{
+            con.close();
+        }
+        catch(SQLException e){
+            System.out.println(e);
+        }
+    }
+
 
 }

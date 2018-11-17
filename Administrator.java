@@ -1,8 +1,14 @@
 //import java.beans.Statement;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.lang.*;
 import java.util.Scanner;
+
+import javax.lang.model.util.ElementScanner6;
+
 import java.sql.*;
 
 
@@ -68,24 +74,110 @@ public class Administrator{
         if(con != null){
 
             System.out.println("Database connected");
+            String fail = "Delete table fail";
 
             try{
 
                 Statement stmt = con.createStatement();
-                sql = new Scanner(new File("CREATE_TABLE.sql")).useDelimiter("\\Z").next();
+                //sql = new Scanner(new File("CREATE_TABLE.sql")).useDelimiter("\\Z").next();
                 //System.out.println(sql);
-                //ResultSet rs = stmt.executeQuery(sql);
+                File f = new File("CREATE_TABLE.sql");
 
+                BufferedReader bf = new BufferedReader(new FileReader(f));
+                String line = null , old = "";
+                line = bf.readLine();
+                while(line != null){
+                    if(line.endsWith(";")){
+                        sql = "";
+                        sql = old + line;
+                        System.out.println(sql);
+                        stmt.executeUpdate(sql);
+                        old = "";
+                    }
+                    else{
+                        old = old + "\n" + line;
+                    }
+                    line = bf.readLine();
+                } 
+                System.out.println("Create table success");
             }
             catch(FileNotFoundException e){
 
                 System.out.println(e);
+                System.out.println(fail);
 
             }
             catch(SQLException e){
 
                 System.out.println(e);
+                System.out.println(fail);
 
+            }
+            catch(IOException e){
+                System.out.println(e);
+                System.out.println(fail);
+            }
+
+
+        }
+        else{
+
+            System.out.println("Cannot connect to db");
+        }
+        db.CloseConnection(con);
+        System.exit(0);
+    }
+
+    public static void Delete_Table() {
+        System.out.println("Delete_Table");
+        Database db = new Database();
+        String sql = "";
+        Connection con = db.getConnection();
+
+        if(con != null){
+
+            System.out.println("Database connected");
+            String fail = "Delete table fail";
+
+            try{
+
+                Statement stmt = con.createStatement();
+                //sql = new Scanner(new File("CREATE_TABLE.sql")).useDelimiter("\\Z").next();
+                //System.out.println(sql);
+                File f = new File("DROP_TABLE.sql");
+
+                BufferedReader bf = new BufferedReader(new FileReader(f));
+                String line = null , old = "";
+                line = bf.readLine();
+                while(line != null){
+                    if(line.endsWith(";")){
+                        System.out.println(old+line);
+                        stmt.executeUpdate(old + line);
+                        old = "";
+                    }
+                    else{
+                        old = old + "\n" + line;
+                    }
+                    line = bf.readLine();
+                }
+                System.out.println("Delete table success");
+
+            }
+            catch(FileNotFoundException e){
+
+                System.out.println(e);
+                System.out.println(fail);
+
+            }
+            catch(SQLException e){
+
+                System.out.println(e);
+                System.out.println(fail);
+
+            }
+            catch(IOException e){
+                System.out.println(e);
+                System.out.println(fail);
             }
 
         }
@@ -93,21 +185,68 @@ public class Administrator{
 
             System.out.println("Cannot connect to db");
         }
-        
-        System.exit(0);
-    }
-    public static void Delete_Table() {
-        System.out.println("Delete_Table");
+        db.CloseConnection(con);
         System.exit(0);
     }
     public static void Load_data() {
 
         System.out.println("Load_data");
+        Database db = new Database();
+        String sql = "";
+        
+        try{
+            Connection con = db.getConnection();
+            CSVLoader loader = new CSVLoader(con);
+            String[] attributes = new String[] {"id", "name", "vid"};
+            loader.loadCSV("test_data\\drivers.csv", "Driver", attributes, true);
+            loader.loadCSV("test_data\\passengers.csv", "Passenger", new String[] {"id", "name"}, true);
+            loader.loadCSV("test_data\\trips.csv", "Trip", 
+                new String[] {"id", "did", "pid", "start", "end", "fee", "rating"}, true);
+            loader.loadCSV("test_data\\vehicles.csv", "Vehicle", 
+                new String[] {"id", "model", "model_year", "seats"}, true);
+            db.CloseConnection(con);
+        }
+        catch(Exception e){
+            System.out.println(e);
+        }
         System.exit(0);
     }
     public static void Check_data() {
 
         System.out.println("Check_data");
+        Database db = new Database();
+        String sql = "SHOW TABLES";
+        Connection con = db.getConnection();
+        try{
+            Statement stmt = con.createStatement();
+            ResultSet resultSet = stmt.executeQuery(sql);
+            //System.out.println(resultSet.toString());
+            
+            if(!resultSet.isBeforeFirst())
+	            System.out.println("No records found.");
+            else{
+                System.out.println("Number of records in each table:");
+	            while(resultSet.next()){
+                    String tableName = resultSet.getString(1);
+                    //System.out.println(tableName);
+                    String query = String.format("SELECT COUNT(*) FROM %s;",tableName);
+                    Statement stmt1 = con.createStatement();
+                    ResultSet getNumRes = stmt1.executeQuery(query);
+                    if(getNumRes.next()){
+                        Integer getNumber = getNumRes.getInt(1);
+                        System.out.printf("Table %s: %d\n", tableName ,getNumber);
+                    }
+	            }
+            }
+
+            con.close();
+
+        }
+        catch(SQLException e){
+            System.out.println(e);
+            //con.close();
+        }
+
         System.exit(0);
     }
 

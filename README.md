@@ -12,5 +12,6 @@ $ git push
 
 ```
 javac project.java
-java -classpath '.;.\classes\mysql-connector-java-5.1.47\*' project
+java -classpath ".;.\mysql-connector-java-5.1.47\mysql-connector-java-5.1.47-bin.jar" project //windows
+java -classpath ".;./mysql-connector-java-5.1.47/mysql-connector-java-5.1.47-bin.jar" project //linux or macos
 ```
