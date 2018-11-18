@@ -3,10 +3,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-//import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.StringJoiner;
+import java.util.*;
+import java.lang.*;
+// import java.util.Date;
+// import java.util.List;
+// import java.util.StringJoiner;
 
 
 class CSVLoader {
@@ -70,14 +71,21 @@ class CSVLoader {
         System.out.println(query);
 		// query = query
         // 		.replaceFirst(KEYS_REGEX, StringUtils.join(headerRow, ","));
-        StringJoiner questionmark = new StringJoiner(",");
-        StringJoiner attr = new StringJoiner(",");
+        StringBuilder questionmark = new StringBuilder();
+		StringBuilder attr = new StringBuilder();
+		boolean first = true;
         for(int i = 0; i < attributes.length; i++){
-            questionmark.add("?");
-            attr.add(attributes[i]);
+			if(first)
+				first = false;
+			else{
+				questionmark.append(",");
+				attr.append(",");
+			}
+            questionmark.append("?");
+            attr.append(attributes[i]);
         }
-        //System.out.println(questionmark.toString());
-        //System.out.println(attr.toString());
+        System.out.println(questionmark.toString());
+        System.out.println(attr.toString());
         query = query.replaceFirst(KEYS_REGEX, attr.toString());
         query = query.replaceFirst(VALUES_REGEX, questionmark.toString()) ;
         //System.out.println(query);
