@@ -192,18 +192,19 @@ public class Administrator{
 
         System.out.println("Load_data");
         Database db = new Database();
-        String sql = "";
+        //String sql = "";
         
         try{
             Connection con = db.getConnection();
             CSVLoader loader = new CSVLoader(con);
             String[] attributes = new String[] {"id", "name", "vid"};
-            loader.loadCSV("test_data\\drivers.csv", "Driver", attributes, true);
-            loader.loadCSV("test_data\\passengers.csv", "Passenger", new String[] {"id", "name"}, true);
-            loader.loadCSV("test_data\\trips.csv", "Trip", 
-                new String[] {"id", "did", "pid", "start", "end", "fee", "rating"}, true);
-            loader.loadCSV("test_data\\vehicles.csv", "Vehicle", 
+            loader.loadCSV("test_data/vehicles.csv", "Vehicle", 
                 new String[] {"id", "model", "model_year", "seats"}, true);
+            loader.loadCSV("test_data/drivers.csv", "Driver", attributes, true);
+            loader.loadCSV("test_data/passengers.csv", "Passenger", new String[] {"id", "name"}, true);
+            loader.loadCSV("test_data/trips.csv", "Trip", 
+                new String[] {"id", "did", "pid", "start", "end", "fee", "rating"}, true);
+            
             db.CloseConnection(con);
         }
         catch(Exception e){
