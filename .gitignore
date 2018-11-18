@@ -1,6 +1,5 @@
-mysql-connector-java-5.1.47/src/doc/sources/.classpath
-mysql-connector-java-5.1.47/src/doc/sources/.project
-mysql-connector-java-5.1.47/src/doc/sources/.settings/*
+mysql-connector-java-5.1.47/*
+
 test_data/*
 .vscode/*
 # Compiled class file
