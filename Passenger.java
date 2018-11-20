@@ -259,32 +259,44 @@ class Passenger{
             }
         }
         try{
-            String dbAddress = "jdbc:mysql://projgw.cse.cuhk.edu.hk:2633/db12";
-            String dbUsername = "Group12";
-            String dbPassword = "apple";
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection conn = DriverManager.getConnection(dbAddress, dbUsername, dbPassword);
-            String sql = "SELECT * FROM Trip WHERE pid=? and start=? and end=?;";
+            Database db = new Database();
+            Connection conn = db.getConnection();
+            String sql = "SELECT * FROM Trip WHERE pid=? and date(start)=? and date(end)=?;";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, pid);
             pstmt.setString(2, start_date);
             pstmt.setString(3, end_date);
             ResultSet resultSet = pstmt.executeQuery();
-            if(!resultSet.isBeforeFirst())
-            System.out.println("No records found.");
-            else
+            ResultSetMetaData rsmd = resultSet.getMetaData();
+            Integer getColumnCount = rsmd.getColumnCount();
+
+            //print header
+            System.out.println("Trip ID, Driver Name, ");
+            //print all record
             while(resultSet.next()){
-                System.out.print(resultSet.getInt("id"));
-                System.out.print(resultSet.getString("start")); // 1/1/2018
-                System.out.print(resultSet.getString("end"));
-                System.out.print(resultSet.getInt("fee"));
-                System.out.print(resultSet.getFloat("rating"));
+                StringBuilder record = new StringBuilder();
+                Boolean first1 = true;
+                for (int i = 1; i <= getColumnCount; i++ ) {
+                    String col = resultSet.getString(i);
+    
+                    if(first1 == true){
+                        first1 = false;
+                        record.append(col);
+                    }
+                    else{
+                        record.append(", ");
+                        record.append(col);
+                    }
+                }
+                
+                System.out.println(record.toString());
+
             }
             conn.close();
         }
-        catch(ClassNotFoundException e){
-            System.out.println("[ERROR]: java MYSQL DB Driver fot found !!");
-        }
+        //catch(ClassNotFoundException e){
+        //    System.out.println("[ERROR]: java MYSQL DB Driver fot found !!");
+        //}
         catch(SQLException e){
             System.out.println(e);
         }
@@ -341,7 +353,7 @@ class Passenger{
                 input = 0;
             }
         }
-
+        scanner.close();
         list();
     }
     public static void Go_back() {
