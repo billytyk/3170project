@@ -108,7 +108,7 @@ class Passenger{
                 else{
                     Integer valid_input = Integer.parseInt(readModelYear);
                     if(valid_input == Integer.parseInt(readModelYear))
-                    {    
+                    {
                         model_year = readModelYear;
                         input = 1;
                     }
@@ -250,7 +250,7 @@ class Passenger{
                     Available_Driver = resultSet.getInt(1);
                     System.out.println("Available Driver = "+ String.valueOf(Available_Driver));
                 }
-                
+
                 //conn.close();
             }
             //ResultSet resultSet = pstmt.executeQuery();
@@ -276,7 +276,7 @@ class Passenger{
                 System.out.println(
                     String.format("Your request is placed. %d drivers are able to take the request."
                     ,Available_Driver));
-                
+
             }
             else{
                 System.out.println("No matched result found.Please adjust your criterion.");
@@ -349,12 +349,12 @@ class Passenger{
         try{
             Database db = new Database();
             Connection conn = db.getConnection();
-            String sql = 
-            "SELECT Trip.id as Trip_ID, Driver.name as Driver_Name," 
+            String sql =
+            "SELECT Trip.id as Trip_ID, Driver.name as Driver_Name,"
             +"Vehicle.id as Vehicle_ID, Vehicle.model as Vehicle_model,"
             +"Trip.Start as Start, Trip.End as End, Trip.fee as Fee, Trip.rating as Rating\n"
             +"FROM Trip, Driver, Vehicle\n"
-            +"WHERE  Trip.did = Driver.id AND Trip.pid=? AND Driver.vid=Vehicle.id\n" 
+            +"WHERE  Trip.did = Driver.id AND Trip.pid=? AND Driver.vid=Vehicle.id\n"
             +"AND DATE(Trip.Start)>=? AND DATE(Trip.End)<=?\n"
             +"ORDER BY Trip.start DESC;";
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -376,7 +376,7 @@ class Passenger{
                     Boolean first1 = true;
                     for (int i = 1; i <= getColumnCount; i++ ) {
                         String col = resultSet.getString(i);
-        
+
                         if(first1 == true){
                             first1 = false;
                             record.append(col);
@@ -386,7 +386,7 @@ class Passenger{
                             record.append(col);
                         }
                     }
-                    
+
                     System.out.println(record.toString());
 
                 }
@@ -453,7 +453,66 @@ class Passenger{
                 input = 0;
             }
         }
-        scanner.close();
+        try{
+            Database db = new Database();
+            Connection conn = db.getConnection();
+            String tmp_sql = "UPDATE Trip SET rating=? WHERE id=? AND pid=?;";
+            PreparedStatement tmp_stmt = conn.prepareStatement(tmp_sql);
+            tmp_stmt.setInt(1, rate);
+            tmp_stmt.setInt(2, tid);
+            tmp_stmt.setInt(3, pid);
+            tmp_stmt.executeUpdate();
+
+            String sql =
+            "SELECT Trip.id as Trip_ID, Driver.name as Driver_Name,"
+            +"Vehicle.id as Vehicle_ID, Vehicle.model as Vehicle_model,"
+            +"Trip.Start as Start, Trip.End as End, Trip.fee as Fee, Trip.rating as Rating\n"
+            +"FROM Trip, Driver, Vehicle\n"
+            +"WHERE Trip.id=?\n"
+            +";";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, tid);
+            //pstmt.setInt(2, pid);
+            ResultSet resultSet = pstmt.executeQuery();
+            ResultSetMetaData rsmd = resultSet.getMetaData();
+            Integer getColumnCount = rsmd.getColumnCount();
+            if(!resultSet.isBeforeFirst()){
+                System.out.println("No record found");
+            }
+            else{
+                //print header
+                System.out.println("Trip ID, Driver Name, Vehicle ID, Vehicle Model, Start, End, Fee, Rating");
+                //print all record
+                while(resultSet.next()){
+                    StringBuilder record = new StringBuilder();
+                    Boolean first1 = true;
+                    for (int i = 1; i <= getColumnCount; i++ ) {
+                        String col = resultSet.getString(i);
+
+                        if(first1 == true){
+                            first1 = false;
+                            record.append(col);
+                        }
+                        else{
+                            record.append(", ");
+                            record.append(col);
+                        }
+                    }
+
+                    System.out.println(record.toString());
+
+                }
+            }
+
+            conn.close();
+        }
+        //catch(ClassNotFoundException e){
+        //    System.out.println("[ERROR]: java MYSQL DB Driver fot found !!");
+        //}
+        catch(SQLException e){
+            System.out.println(e);
+        }
+        //scanner.close();
         list();
     }
     public static void Go_back() {
