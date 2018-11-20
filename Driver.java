@@ -1,6 +1,8 @@
 import java.lang.*;
 import java.util.Scanner;
-
+import java.sql.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 class Driver{
     public static void list(){
         Integer input = 0;
@@ -88,10 +90,52 @@ class Driver{
                 input = 0;
             }
         }
-        list();
 
-        
+        try{
+            String dbAddress = "jdbc:mysql://projgw.cse.cuhk.edu.hk:2633/db12";
+            String dbUsername = "Group12";
+            String dbPassword = "apple";
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection conn = DriverManager.getConnection(dbAddress, dbUsername, dbPassword);
+            //if((!did.isEmpty()||!did.equals(" "))&&(!rid.isEmpty()||!rid.equals(" "))){
+                //String sql = "SELECT * FROM Vehicle WHERE seats=? and model_year=? and model=?;";
+                String sql = "SELECT Request.id as Request_ID, Passenger.name as Passenger_Name," 
+                +"Request.passengers as Passenger\n"
+                +"FROM Request, Passenger, Driver, Vehicle\n"
+                +"WHERE  Driver.id = ? AND Driver.vid=Vehicle.id  AND Vehicle.seats >= Request.Passengers" 
+                +"AND Vehicle.model = Request.model\n";
+                
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                pstmt.setInt(1, did);
+                
+                
+
+                ResultSet resultSet = pstmt.executeQuery();
+                if(!resultSet.isBeforeFirst())
+                System.out.println("No records found.");
+                else{
+                    while(resultSet.next()){
+                        Integer i = resultSet.getInt(1);
+                        System.out.println(i);
+                    }
+                }
+                conn.close();
+           // }
+           
+            //ResultSet resultSet = pstmt.executeQuery();
+           // conn.close();
+        }
+        catch(ClassNotFoundException e){
+            System.out.println("[ERROR]: java MYSQL DB Driver nSot found !!");
+        }
+        catch(SQLException e){
+            System.out.println(e);
+        }
+
+        list();
     }
+
+  
     public static void Finish_trip() {
         Integer input = 0;
         Integer did = 0;
