@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS Request(
     id integer primary key AUTO_INCREMENT,
     taken integer,
     model_year integer(4),
-    model integer(30),
+    model varchar(30),
     passengers integer
 );
 

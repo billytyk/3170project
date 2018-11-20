@@ -1,3 +1,3 @@
-DROP TABLE IF EXISTS Driver, Passenger, Trip, Vehicle;
+DROP TABLE IF EXISTS Driver, Passenger, Trip, Vehicle,Request;
 
 SHOW TABLES;

@@ -82,8 +82,9 @@ class Passenger{
                 input = validate.nextInt();
                 validate.close();
                 // System.out.println(input);
-                if (input > 8 || input < 1){
+                if (input > 8 || input < 3){
                     input = 0;
+                    System.out.println("Seats number should be between 3 and 8!!!!");
                 }
                 else {
                     numPass = input;
@@ -99,11 +100,19 @@ class Passenger{
             System.out.println("Please enter the earlist model year. (Please enter to skip)");
             try{
                 String readModelYear = scanner.nextLine();
+                //System.out.println(readModelYear);
                 if(readModelYear.isEmpty()||readModelYear.equals(" ")){
                     model_year = "";
                     input = 1;
                 }
-                model_year = readModelYear;
+                else{
+                    Integer valid_input = Integer.parseInt(readModelYear);
+                    if(valid_input == Integer.parseInt(readModelYear))
+                    {    
+                        model_year = readModelYear;
+                        input = 1;
+                    }
+                }
             } catch(Exception e){
                 System.out.println(input_err);
                 input = 0;
@@ -119,98 +128,171 @@ class Passenger{
                     model="";
                     input=1;
                 }
-                model = readModel;
+                else{
+                    model = readModel;
+                    input = 1;
+                }
             } catch(Exception e){
                 System.out.println(input_err);
                 input = 0;
             }
         }
         // System.out.println(numPass);
+        // System.out.println(numPass);
         try{
-            String dbAddress = "jdbc:mysql://projgw.cse.cuhk.edu.hk:2633/db12";
-            String dbUsername = "Group12";
-            String dbPassword = "apple";
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection conn = DriverManager.getConnection(dbAddress, dbUsername, dbPassword);
-            if((!model_year.isEmpty()||!model_year.equals(" "))&&(!model.isEmpty()||!model.equals(" "))){
-                String sql = "SELECT * FROM Vehicle WHERE seats=? and model_year=? and model=?;";
+            Database db = new Database();
+            Connection conn = db.getConnection();
+            Integer Available_Driver = 0;
+            if((!(model_year.isEmpty()||model_year.equals(" ")))&&!(model.isEmpty()||model.equals(" "))){
+                System.out.println("Model + Model year");
+                String sql = "SELECT COUNT(*)"
+                +"FROM (SELECT DISTINCT Vehicle.id as Car_id, Vehicle.model "
+                +"FROM Driver, Vehicle "
+                +"WHERE Driver.vid=Vehicle.id AND Vehicle.model LIKE ? AND Vehicle.model_year>=? "
+                +"And Vehicle.seats >=?) as Available;";
                 PreparedStatement pstmt = conn.prepareStatement(sql);
 
-                pstmt.setInt(1, numPass);
+                pstmt.setString(1, "%"+model+"%");
                 pstmt.setString(2, model_year);
-                pstmt.setString(3, model);
+                pstmt.setInt(3, numPass);
+                System.out.println(pstmt.toString());
                 ResultSet resultSet = pstmt.executeQuery();
                 if(!resultSet.isBeforeFirst())
-                System.out.println("No records found.");
+                    System.out.println("No records found.");
                 else{
-                    while(resultSet.next()){
-                        Integer i = resultSet.getInt(1);
-                        System.out.println(i);
-                    }
+                    // while(resultSet.next()){
+                    //     Integer i = resultSet.getInt(1);
+                    //     System.out.println(i);
+                    // }
+                    resultSet.next();
+                    Available_Driver = resultSet.getInt(1);
+                    System.out.println("Available Driver = "+ String.valueOf(Available_Driver));
                 }
-                conn.close();
+                //conn.close();
             }
-            else if(!model.isEmpty()||!model.equals(" ")){
-                String sql = "SELECT * FROM Vehicle WHERE seats=? and model_year=?;";
+            else if(!(model.isEmpty()||model.equals(" "))&&(model_year.isEmpty()||model_year.equals(" "))){
+                System.out.println("Only model");
+                System.out.println("Model + Model year");
+                String sql = "SELECT COUNT(*)"
+                +"FROM (SELECT DISTINCT Vehicle.id as Car_id, Vehicle.model "
+                +"FROM Driver, Vehicle "
+                +"WHERE Driver.vid=Vehicle.id AND Vehicle.model LIKE ? "
+                +"AND Vehicle.seats >=?) as Available;";
                 PreparedStatement pstmt = conn.prepareStatement(sql);
 
-                pstmt.setInt(1, numPass);
-                pstmt.setString(2, model_year);
+                pstmt.setInt(2, numPass);
+                pstmt.setString(1, "%"+model+"%");
+                System.out.println(pstmt.toString());
+
                 ResultSet resultSet = pstmt.executeQuery();
                 if(!resultSet.isBeforeFirst())
                 System.out.println("No records found.");
                 else{
-                    while(resultSet.next()){
-                        Integer i = resultSet.getInt(1);
-                        System.out.println(i);
-                    }
+                    // while(resultSet.next()){
+                    //     Integer i = resultSet.getInt(1);
+                    //     System.out.println(i);
+                    // }
+                    resultSet.next();
+                    Available_Driver = resultSet.getInt(1);
+                    System.out.println("Available Driver = "+ String.valueOf(Available_Driver));
                 }
-                conn.close();
+                //conn.close();
             }
-            else if(!model_year.isEmpty()||!model_year.equals(" ")){
-                String sql = "SELECT * FROM Vehicle WHERE seats=? and model=?;";
+            else if(!(model_year.isEmpty()||model_year.equals(" ")) && (model.isEmpty()||model.equals(" "))){
+                System.out.println("Only model_year");
+                System.out.println("Model + Model year");
+                String sql = "SELECT COUNT(*)"
+                +"FROM (SELECT DISTINCT Vehicle.id as Car_id, Vehicle.model "
+                +"FROM Driver, Vehicle "
+                +"WHERE Driver.vid=Vehicle.id AND Vehicle.model_year>=? "
+                +"And Vehicle.seats >=?) as Available;";
                 PreparedStatement pstmt = conn.prepareStatement(sql);
 
-                pstmt.setInt(1, numPass);
-                pstmt.setString(2, model);
+                pstmt.setString(1, model_year);
+                pstmt.setInt(2, numPass);
+                System.out.println(pstmt.toString());
+
                 ResultSet resultSet = pstmt.executeQuery();
                 if(!resultSet.isBeforeFirst())
                 System.out.println("No records found.");
                 else{
-                    while(resultSet.next()){
-                        Integer i = resultSet.getInt(1);
-                        System.out.println(i);
-                    }
+                    // while(resultSet.next()){
+                    //     Integer i = resultSet.getInt(1);
+                    //     System.out.println(i);
+                    // }
+                    resultSet.next();
+                    Available_Driver = resultSet.getInt(1);
+                    System.out.println("Available Driver = "+ String.valueOf(Available_Driver));
                 }
-                conn.close();
+                //conn.close();
             }
             else{
-                String sql = "SELECT * FROM Vehicle WHERE seats=?;";
+                System.out.println("Both no model year and model");
+                String sql = "SELECT COUNT(*)"
+                +"FROM (SELECT DISTINCT Vehicle.id as Car_id, Vehicle.model "
+                +"FROM  Driver, Vehicle "
+                +"WHERE Driver.vid=Vehicle.id AND Vehicle.seats >=?) as Available;";
                 PreparedStatement pstmt = conn.prepareStatement(sql);
 
+
                 pstmt.setInt(1, numPass);
+                System.out.println(pstmt.toString());
+
                 ResultSet resultSet = pstmt.executeQuery();
                 if(!resultSet.isBeforeFirst())
                 System.out.println("No records found.");
                 else{
-                    while(resultSet.next()){
-                        Integer i = resultSet.getInt(1);
-                        System.out.println(i);
-                    }
+                    // while(resultSet.next()){
+                    //     Integer i = resultSet.getInt(1);
+                    //     System.out.println(i);
+                    // }
+                    resultSet.next();
+                    Available_Driver = resultSet.getInt(1);
+                    System.out.println("Available Driver = "+ String.valueOf(Available_Driver));
                 }
-                conn.close();
+                
+                //conn.close();
             }
             //ResultSet resultSet = pstmt.executeQuery();
+            if(Available_Driver > 0){
+
+                String addRequest = "INSERT INTO Request(model_year,model,passengers) VALUES(?,?,?);";
+                PreparedStatement ps = conn.prepareStatement(addRequest);
+                if (model_year.equals("") || model_year.equals(" ")){
+                    ps.setNull(1,Types.INTEGER);
+                }
+                else{
+                    ps.setString(1, model_year);
+                }
+                if (model.equals("") || model.equals(" ")){
+                    ps.setNull(2,Types.VARCHAR);
+                }
+                else{
+                    ps.setString(2, model);
+                }
+                ps.setInt(3,numPass);
+                ps.executeUpdate();
+
+                System.out.println(
+                    String.format("Your request is placed. %d drivers are able to take the request."
+                    ,Available_Driver));
+                
+            }
+            else{
+                System.out.println("No matched result found.Please adjust your criterion.");
+            }
+
             conn.close();
         }
-        catch(ClassNotFoundException e){
-            System.out.println("[ERROR]: java MYSQL DB Driver fot found !!");
-        }
+
         catch(SQLException e){
             System.out.println(e);
         }
 
+
+        //scanner.close();
         list();
+
     }
     public static void Check_records() {
         Integer input = 0;
