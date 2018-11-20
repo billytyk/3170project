@@ -51,19 +51,116 @@ class Driver{
     
     }
     public static void Take_request() {
+        
+        Integer input = 0;
+        Integer did = 0;
+        Integer rid = 0;
+        String start_date = "0000-00-00";
+        String end_date = "0000-00-00";
+        String input_err = "[ERROR] Invalid input.";
+        Scanner scanner = new Scanner(System.in);
 
+        while (input <= 0){
+            System.out.println("Please enter your ID.");
+            try{
+                String line = scanner.nextLine();
+                Scanner validate = new Scanner(line);
+                input = validate.nextInt();
+                validate.close();
+                did = input;
+            } catch(Exception e){
+                System.out.println(input_err);
+                input = 0;
+            }
+        }
+        input = 0;
+        while (input <= 0){
+            System.out.println("Please enter the request ID.");
+            try{
+                String line = scanner.nextLine();
+                Scanner validate = new Scanner(line);
+                input = validate.nextInt();
+                validate.close();
+                rid = input;
+              
+            } catch(Exception e){
+                System.out.println(input_err);
+                input = 0;
+            }
+        }
         list();
+
+        
     }
     public static void Finish_trip() {
+        Integer input = 0;
+        Integer did = 0;
+        Integer pid = 0;
+        String choose;
+        String start_date = "0000-00-00";
+        String end_date = "0000-00-00";
+        String input_err = "[ERROR] Invalid input.";
+        Scanner scanner = new Scanner(System.in);
+        while (input <= 0){
+            System.out.println("Please enter your ID.");
+            try{
+                String line = scanner.nextLine();
+                Scanner validate = new Scanner(line);
+                input = validate.nextInt();
+                validate.close();
+                did = input;
+            } catch(Exception e){
+                System.out.println(input_err);
+                input = 0;
+            }
+        }
+        input = 0;
+        while (input<=0){
+            System.out.println("Do you wish to finish the trip.");
+            try{
+                String line1 = scanner.nextLine();
+                ////Scanner validate = new Scanner(line);
+                //input = validate.nextInt();
+                
+                //validate.close();
+                if(line1.equals("y")||line1.equals("n")){
+                choose = line1;
+                input = 1;
+                }
 
+            } 
+            catch(Exception e){
+                System.out.println(input_err);
+                input = 0;
+            }
+        }
         list();
     }
     public static void Check_rating() {
-
+        
+        Integer input = 0;
+        Integer pid = 0;
+        Integer did = 0;
+        String start_date = "0000-00-00";
+        String end_date = "0000-00-00";
+        String input_err = "[ERROR] Invalid input.";
+        Scanner scanner = new Scanner(System.in);
+        while (input <= 0){
+            System.out.println("Please enter your ID.");
+            try{
+                String line2 = scanner.nextLine();
+                Scanner validate = new Scanner(line2);
+                input = validate.nextInt();
+                validate.close();
+                did = input;
+            } catch(Exception e){
+                System.out.println(input_err);
+                input = 0;
+            }
+        }
         list();
     }
     public static void Go_back() {
-
-        list();
+        Administrator.list();
     }
 }
