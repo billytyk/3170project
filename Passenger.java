@@ -1,6 +1,8 @@
 import java.lang.*;
 import java.util.Scanner;
 import java.sql.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 
 
@@ -238,6 +240,8 @@ class Passenger{
             try{
                 String read_start_date = scanner.nextLine();
                 start_date = read_start_date;
+                DateFormat df = new SimpleDateFormat("yyyy-mm-dd");
+                df.parse(read_start_date);
                 input=1;
             } catch(Exception e){
                 System.out.println(input_err);
@@ -251,6 +255,8 @@ class Passenger{
             try{
                 String read_end_date = scanner.nextLine();
                 end_date = read_end_date;
+                DateFormat df = new SimpleDateFormat("yyyy-mm-dd");
+                df.parse(read_end_date);
                 input=1;
             }
             catch(Exception e){
@@ -261,7 +267,14 @@ class Passenger{
         try{
             Database db = new Database();
             Connection conn = db.getConnection();
-            String sql = "SELECT * FROM Trip WHERE pid=? and date(start)=? and date(end)=?;";
+            String sql = 
+            "SELECT Trip.id as Trip_ID, Driver.name as Driver_Name," 
+            +"Vehicle.id as Vehicle_ID, Vehicle.model as Vehicle_model,"
+            +"Trip.Start as Start, Trip.End as End, Trip.fee as Fee, Trip.rating as Rating\n"
+            +"FROM Trip, Driver, Vehicle\n"
+            +"WHERE  Trip.did = Driver.id AND Trip.pid=? AND Driver.vid=Vehicle.id\n" 
+            +"AND DATE(Trip.Start)>=? AND DATE(Trip.End)<=?\n"
+            +"ORDER BY Trip.start DESC;";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, pid);
             pstmt.setString(2, start_date);
@@ -269,29 +282,34 @@ class Passenger{
             ResultSet resultSet = pstmt.executeQuery();
             ResultSetMetaData rsmd = resultSet.getMetaData();
             Integer getColumnCount = rsmd.getColumnCount();
-
-            //print header
-            System.out.println("Trip ID, Driver Name, ");
-            //print all record
-            while(resultSet.next()){
-                StringBuilder record = new StringBuilder();
-                Boolean first1 = true;
-                for (int i = 1; i <= getColumnCount; i++ ) {
-                    String col = resultSet.getString(i);
-    
-                    if(first1 == true){
-                        first1 = false;
-                        record.append(col);
-                    }
-                    else{
-                        record.append(", ");
-                        record.append(col);
-                    }
-                }
-                
-                System.out.println(record.toString());
-
+            if(!resultSet.isBeforeFirst()){
+                System.out.println("No record found");
             }
+            else{
+                //print header
+                System.out.println("Trip ID, Driver Name, Vehicle ID, Vehicle Model, Start, End, Fee, Rating");
+                //print all record
+                while(resultSet.next()){
+                    StringBuilder record = new StringBuilder();
+                    Boolean first1 = true;
+                    for (int i = 1; i <= getColumnCount; i++ ) {
+                        String col = resultSet.getString(i);
+        
+                        if(first1 == true){
+                            first1 = false;
+                            record.append(col);
+                        }
+                        else{
+                            record.append(", ");
+                            record.append(col);
+                        }
+                    }
+                    
+                    System.out.println(record.toString());
+
+                }
+            }
+
             conn.close();
         }
         //catch(ClassNotFoundException e){
