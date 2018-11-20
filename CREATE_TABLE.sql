@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS Passenger(
     );
 
 CREATE TABLE IF NOT EXISTS Trip(
-	id integer primary key,
+	id integer primary key AUTO_INCREMENT,
     did integer,
     pid integer,
     start DATETIME not null,
@@ -30,4 +30,12 @@ CREATE TABLE IF NOT EXISTS Trip(
     fee integer,
     rating float
     );
+
+CREATE TABLE IF NOT EXISTS Request(
+    id integer primary key AUTO_INCREMENT,
+    taken integer,
+    model_year integer(4),
+    model integer(30),
+    passengers integer
+);
 

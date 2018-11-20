@@ -75,9 +75,10 @@ public class Administrator{
 
             System.out.println("Database connected");
             String fail = "Delete table fail";
+            
 
             try{
-
+                //con.setAutoCommit(false);
                 Statement stmt = con.createStatement();
                 //sql = new Scanner(new File("CREATE_TABLE.sql")).useDelimiter("\\Z").next();
                 //System.out.println(sql);
@@ -91,18 +92,20 @@ public class Administrator{
                         sql = "";
                         sql = old + line;
                         System.out.println(sql);
-                        stmt.executeUpdate(sql);
+                        stmt.addBatch(sql);
+                        //stmt.executeUpdate(sql);
                         old = "";
                     }
                     else{
                         old = old + "\n" + line;
                     }
                     line = bf.readLine();
-                } 
+                }
+                stmt.executeBatch();
+                //con.commit();
                 System.out.println("Create table success");
             }
             catch(FileNotFoundException e){
-
                 System.out.println(e);
                 System.out.println(fail);
 
@@ -131,7 +134,7 @@ public class Administrator{
     public static void Delete_Table() {
         System.out.println("Delete_Table");
         Database db = new Database();
-        String sql = "";
+        //String sql = "";
         Connection con = db.getConnection();
 
         if(con != null){
