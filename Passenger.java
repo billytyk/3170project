@@ -50,10 +50,10 @@ class Passenger{
     }
     public static void Request_ride() {
         Integer input = 0;
-        Integer pid;
-        Integer numPass;
-        String model_year;
-        String model;
+        Integer pid = 0;
+        Integer numPass = 0;
+        String model_year = "";
+        String model = "";
         String input_err = "[ERROR] Invalid input.";
         Scanner scanner = new Scanner(System.in);
         // Please enter your ID
@@ -79,9 +79,13 @@ class Passenger{
                 Scanner validate = new Scanner(line);
                 input = validate.nextInt();
                 validate.close();
-                if (input > 8 || input < 1)
-                input = 0;
-                else  numPass = input;
+                // System.out.println(input);
+                if (input > 8 || input < 1){
+                    input = 0;
+                }
+                else {
+                    numPass = input;
+                }
             } catch(Exception e){
                 System.out.println(input_err);
                 input = 0;
@@ -118,6 +122,90 @@ class Passenger{
                 System.out.println(input_err);
                 input = 0;
             }
+        }
+        // System.out.println(numPass);
+        try{
+            String dbAddress = "jdbc:mysql://projgw.cse.cuhk.edu.hk:2633/db12";
+            String dbUsername = "Group12";
+            String dbPassword = "apple";
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection conn = DriverManager.getConnection(dbAddress, dbUsername, dbPassword);
+            if((!model_year.isEmpty()||!model_year.equals(" "))&&(!model.isEmpty()||!model.equals(" "))){
+                String sql = "SELECT * FROM Vehicle WHERE seats=? and model_year=? and model=?;";
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+
+                pstmt.setInt(1, numPass);
+                pstmt.setString(2, model_year);
+                pstmt.setString(3, model);
+                ResultSet resultSet = pstmt.executeQuery();
+                if(!resultSet.isBeforeFirst())
+                System.out.println("No records found.");
+                else{
+                    while(resultSet.next()){
+                        Integer i = resultSet.getInt(1);
+                        System.out.println(i);
+                    }
+                }
+                conn.close();
+            }
+            else if(!model.isEmpty()||!model.equals(" ")){
+                String sql = "SELECT * FROM Vehicle WHERE seats=? and model_year=?;";
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+
+                pstmt.setInt(1, numPass);
+                pstmt.setString(2, model_year);
+                ResultSet resultSet = pstmt.executeQuery();
+                if(!resultSet.isBeforeFirst())
+                System.out.println("No records found.");
+                else{
+                    while(resultSet.next()){
+                        Integer i = resultSet.getInt(1);
+                        System.out.println(i);
+                    }
+                }
+                conn.close();
+            }
+            else if(!model_year.isEmpty()||!model_year.equals(" ")){
+                String sql = "SELECT * FROM Vehicle WHERE seats=? and model=?;";
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+
+                pstmt.setInt(1, numPass);
+                pstmt.setString(2, model);
+                ResultSet resultSet = pstmt.executeQuery();
+                if(!resultSet.isBeforeFirst())
+                System.out.println("No records found.");
+                else{
+                    while(resultSet.next()){
+                        Integer i = resultSet.getInt(1);
+                        System.out.println(i);
+                    }
+                }
+                conn.close();
+            }
+            else{
+                String sql = "SELECT * FROM Vehicle WHERE seats=?;";
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+
+                pstmt.setInt(1, numPass);
+                ResultSet resultSet = pstmt.executeQuery();
+                if(!resultSet.isBeforeFirst())
+                System.out.println("No records found.");
+                else{
+                    while(resultSet.next()){
+                        Integer i = resultSet.getInt(1);
+                        System.out.println(i);
+                    }
+                }
+                conn.close();
+            }
+            //ResultSet resultSet = pstmt.executeQuery();
+            conn.close();
+        }
+        catch(ClassNotFoundException e){
+            System.out.println("[ERROR]: java MYSQL DB Driver fot found !!");
+        }
+        catch(SQLException e){
+            System.out.println(e);
         }
 
         list();
@@ -176,12 +264,22 @@ class Passenger{
             String dbPassword = "apple";
             Class.forName("com.mysql.jdbc.Driver");
             Connection conn = DriverManager.getConnection(dbAddress, dbUsername, dbPassword);
-            String sql = "SELECT * FROM Trip WHERE pid=? and start_date=? and end_date=?;";
+            String sql = "SELECT * FROM Trip WHERE pid=? and start=? and end=?;";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, pid);
             pstmt.setString(2, start_date);
             pstmt.setString(3, end_date);
             ResultSet resultSet = pstmt.executeQuery();
+            if(!resultSet.isBeforeFirst())
+            System.out.println("No records found.");
+            else
+            while(resultSet.next()){
+                System.out.print(resultSet.getInt("id"));
+                System.out.print(resultSet.getString("start")); // 1/1/2018
+                System.out.print(resultSet.getString("end"));
+                System.out.print(resultSet.getInt("fee"));
+                System.out.print(resultSet.getFloat("rating"));
+            }
             conn.close();
         }
         catch(ClassNotFoundException e){

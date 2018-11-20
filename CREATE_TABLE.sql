@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS Vehicle(
-	  id varchar(6) NOT NULL,
+	id varchar(6) NOT NULL,
     model varchar(30) not null,
     model_year integer(4) not null,
     seats integer not null,
@@ -30,4 +30,3 @@ CREATE TABLE IF NOT EXISTS Trip(
     fee integer,
     rating float
     );
-
