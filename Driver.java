@@ -46,11 +46,9 @@ class Driver{
                 //System.exit(1);
                 input = 0;
             }
-
         }
 
         scanner.close();
-    
     }
     public static void Take_request() {
         
@@ -97,19 +95,16 @@ class Driver{
             String dbPassword = "apple";
             Class.forName("com.mysql.jdbc.Driver");
             Connection conn = DriverManager.getConnection(dbAddress, dbUsername, dbPassword);
-            //if((!did.isEmpty()||!did.equals(" "))&&(!rid.isEmpty()||!rid.equals(" "))){
-                //String sql = "SELECT * FROM Vehicle WHERE seats=? and model_year=? and model=?;";
+
                 String sql = "SELECT Request.id as Request_ID, Passenger.name as Passenger_Name," 
                 +"Request.passengers as Passenger\n"
                 +"FROM Request, Passenger, Driver, Vehicle\n"
-                +"WHERE  Driver.id = ? AND Driver.vid=Vehicle.id  AND Vehicle.seats >= Request.Passengers" 
+                +"WHERE  Driver.id = ? AND Driver.vid=Vehicle.id AND Vehicle.seats >= Request.passengers" 
                 +"AND Vehicle.model = Request.model\n";
                 
                 PreparedStatement pstmt = conn.prepareStatement(sql);
                 pstmt.setInt(1, did);
-                
-                
-
+   
                 ResultSet resultSet = pstmt.executeQuery();
                 if(!resultSet.isBeforeFirst())
                 System.out.println("No records found.");
@@ -120,10 +115,6 @@ class Driver{
                     }
                 }
                 conn.close();
-           // }
-           
-            //ResultSet resultSet = pstmt.executeQuery();
-           // conn.close();
         }
         catch(ClassNotFoundException e){
             System.out.println("[ERROR]: java MYSQL DB Driver nSot found !!");
@@ -135,7 +126,6 @@ class Driver{
         list();
     }
 
-  
     public static void Finish_trip() {
         Integer input = 0;
         Integer did = 0;
@@ -158,6 +148,58 @@ class Driver{
                 input = 0;
             }
         }
+       
+
+        try{
+            String dbAddress = "jdbc:mysql://projgw.cse.cuhk.edu.hk:2633/db12";
+            String dbUsername = "Group12";
+            String dbPassword = "apple";
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection conn = DriverManager.getConnection(dbAddress, dbUsername, dbPassword);
+            String sql = "SELECT Trip.id as Trip_ID, Trip.pid as Passenger_ID,Trip.start as Start\n" 
+            +"FROM Trip \n"
+            +"WHERE Trip.did = ? AND Trip.end IS NULL\n;" ;
+               
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, did);
+            
+            ResultSet resultSet = pstmt.executeQuery();
+            ResultSetMetaData rsmd = resultSet.getMetaData();
+            Integer getColumnCount = rsmd.getColumnCount();
+                if(!resultSet.isBeforeFirst())
+                    System.out.println("No record found");
+                else{
+                //print header
+                System.out.println("Trip ID, Passenger ID, Start");
+                
+                while(resultSet.next()){
+
+                    StringBuilder record = new StringBuilder();
+
+                    for (int i = 1; i <= getColumnCount; i++ ) {
+                        Integer tripid = resultSet.getInt(1);
+                        Integer passgeid = resultSet.getInt(2);
+                        String starttime = resultSet.getString(3);
+
+                            record.append(tripid);
+                            record.append(", ");
+                            record.append(passgeid);
+                            record.append(", ");
+                            record.append(starttime);
+                        }
+
+                    System.out.println(record.toString());
+                }
+            }
+                conn.close();
+        }
+        catch(ClassNotFoundException e){
+            System.out.println("[ERROR]: java MYSQL DB Driver not found !!");
+        }
+        catch(SQLException e){
+            System.out.println(e);
+        }
+
         input = 0;
         while (input<=0){
             System.out.println("Do you wish to finish the trip.");

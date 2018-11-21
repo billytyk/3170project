@@ -404,9 +404,9 @@ class Passenger{
     }
     public static void Rate_trip() {
         Integer input = 0;
-        Integer pid;
-        Integer tid;
-        Integer rate;
+        Integer pid = 0;
+        Integer tid = 0;
+        Integer rate = 0;
         String input_err = "[ERROR] Invalid input.";
         Scanner scanner = new Scanner(System.in);
         // Please enter your ID
