@@ -470,7 +470,7 @@ class Passenger{
             //+"FROM Trip, Driver, Vehicle\n"
             //+"WHERE Trip.id=? AND Driver.id = Trip.did AND Driver.vid = Vehicle.id\n"
             //+";";
-            "(SELECT Driver.vid FROM Driver, Vehicle WHERE Driver.id = (SELECT Trip.did FROM Trip WHERE id = ?)),Trip WHERE id=?;"
+            "(SELECT Driver.vid FROM Driver, Vehicle WHERE Driver.id = (SELECT Trip.did FROM Trip WHERE id = ?)),Trip WHERE id=?;";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, tid);
             pstmt.setInt(2, tid);
