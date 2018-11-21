@@ -130,7 +130,8 @@ class Driver{
         Integer input = 0;
         Integer did = 0;
         Integer pid = 0;
-        String choose;
+        String choose = "";
+        String end = "";
         String start_date = "0000-00-00";
         String end_date = "0000-00-00";
         String input_err = "[ERROR] Invalid input.";
@@ -191,16 +192,8 @@ class Driver{
                     System.out.println(record.toString());
                 }
             }
-                conn.close();
-        }
-        catch(ClassNotFoundException e){
-            System.out.println("[ERROR]: java MYSQL DB Driver not found !!");
-        }
-        catch(SQLException e){
-            System.out.println(e);
-        }
 
-        input = 0;
+            input = 0;
         while (input<=0){
             System.out.println("Do you wish to finish the trip.");
             try{
@@ -214,18 +207,79 @@ class Driver{
                 input = 1;
                 }
 
-            } 
+            }
+           
             catch(Exception e){
                 System.out.println(input_err);
                 input = 0;
             }
+
+            if (choose.equals("y")) {
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	            Date date = new Date();
+                end = df.format(date); //2016/11/16 12:08:43
+                String set_end = "UPDATE Trip SET Trip.end = ? WHERE Trip.id = ?";
+                PreparedStatement setting = conn.prepareStatement(set_end);
+                setting.setString(1, end);
+                setting.setString(2, tripid);
+
+                String finish = "SELECT Trip.id, Passenger.name, Trip.start, Trip.end FROM Passenger, Trip WHERE Trip.did = ? AND Trip.pid = Passenger.id";
+                
+                PreparedStatement print = conn.prepareStatement(finish);
+                print.setInt(1, did);
+            
+            ResultSet resultSet1 = print.executeQuery();
+            ResultSetMetaData rsmd1 = resultSet1.getMetaData();
+            Integer getColumn = rsmd.getColumnCount();
+                if(!resultSet1.isBeforeFirst())
+                    System.out.println("No record found");
+                else{
+                //print header
+                System.out.println("Trip ID, Passenger Name, Start, End, Fee");
+                
+                while(resultSet1.next()){
+
+                    StringBuilder record1 = new StringBuilder();
+
+                    for (int i = 1; i <= getColumn; i++ ) {
+                        Integer tripid1 = resultSet1.getInt(1);
+                        String passgename = resultSet1.getString(2);
+                        String starttime1 = resultSet1.getString(3);
+                        String endtime = resultSet1.getString(4);
+
+                            record1.append(tripid1);
+                            record1.append(", ");
+                            record1.append(passgename);
+                            record1.append(", ");
+                            record1.append(starttime1);
+                            record1.append(", ");
+                            record1.append(endtime);
+                        }
+
+                    System.out.println(record1.toString());
+                }
+            }
+
+
+                
+            }
         }
 
-       
+       // SELECT Passenger.name FROM Passenger, Trip WHERE Trip.did = 1 AND Trip.pid = Passenger.id;
 
+                conn.close();
+        }
+        catch(ClassNotFoundException e){
+            System.out.println("[ERROR]: java MYSQL DB Driver not found !!");
+        }
+        catch(SQLException e){
+            System.out.println(e);
+        }
 
         list();
     }
+
+    
     public static void Check_rating() {
         
         Integer input = 0;

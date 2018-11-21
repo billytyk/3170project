@@ -456,55 +456,65 @@ class Passenger{
         try{
             Database db = new Database();
             Connection conn = db.getConnection();
-            String tmp_sql = "UPDATE Trip SET rating=? WHERE id=? AND pid=?;";
-            PreparedStatement tmp_stmt = conn.prepareStatement(tmp_sql);
-            tmp_stmt.setInt(1, rate);
-            tmp_stmt.setInt(2, tid);
-            tmp_stmt.setInt(3, pid);
-            tmp_stmt.executeUpdate();
-
-            String sql =
-            //"SELECT Trip.id as Trip_ID, Driver.name as Driver_Name,"
-            //+"Vehicle.id as Vehicle_ID, Vehicle.model as Vehicle_model,"
-            //+"Trip.Start as Start, Trip.End as End, Trip.fee as Fee, Trip.rating as Rating\n"
-            //+"FROM Trip, Driver, Vehicle\n"
-            //+"WHERE Trip.id=? AND Driver.id = Trip.did AND Driver.vid = Vehicle.id\n"
-            //+";";
-            "(SELECT Driver.vid FROM Driver, Vehicle WHERE Driver.id = (SELECT Trip.did FROM Trip WHERE id = ?)),Trip WHERE id=?;";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, tid);
-            pstmt.setInt(2, tid);
-            ResultSet resultSet = pstmt.executeQuery();
-            ResultSetMetaData rsmd = resultSet.getMetaData();
-            Integer getColumnCount = rsmd.getColumnCount();
-            if(!resultSet.isBeforeFirst()){
+            String try_sql = "SELECT * FROM Trip WHERE id=? AND pid=?;";
+            PreparedStatement try_stmt = conn.prepareStatement(try_sql);
+            try_stmt.setInt(1, tid);
+            try_stmt.setInt(2, pid);
+            ResultSet trySet = try_stmt.executeQuery();
+            ResultSetMetaData try_rsmd = trySet.getMetaData();
+            Integer trygetColumnCount = try_rsmd.getColumnCount();
+            if(!trySet.isBeforeFirst()){
                 System.out.println("No record found");
             }
             else{
-                //print header
-                System.out.println("Trip ID, Driver Name, Vehicle ID, Vehicle Model, Start, End, Fee, Rating");
-                //print all record
-                while(resultSet.next()){
-                    StringBuilder record = new StringBuilder();
-                    Boolean first1 = true;
-                    for (int i = 1; i <= getColumnCount; i++ ) {
-                        String col = resultSet.getString(i);
+                String tmp_sql = "UPDATE Trip SET rating=? WHERE id=? AND pid=?;";
+                PreparedStatement tmp_stmt = conn.prepareStatement(tmp_sql);
+                tmp_stmt.setInt(1, rate);
+                tmp_stmt.setInt(2, tid);
+                tmp_stmt.setInt(3, pid);
+                tmp_stmt.executeUpdate();
 
-                        if(first1 == true){
-                            first1 = false;
-                            record.append(col);
+
+                String sql =
+                "SELECT A.id as Trip_ID, B.name as Driver_Name, B.vid as Vehicle_ID, C.model as Vehicle_model, A.start as Start, A.end as End, A.fee as Fee, A.rating as Rating FROM "
+                +"(SELECT * FROM Trip WHERE id = ?) as A,"
+                +"(SELECT Driver.vid, Driver.name FROM Driver WHERE Driver.id = (SELECT Trip.did FROM Trip WHERE id = ?)) as B,"
+                +"(SELECT model FROM Vehicle WHERE id = (SELECT Driver.vid FROM Driver WHERE Driver.id = (SELECT Trip.did FROM Trip WHERE id = ?))) as C";
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                pstmt.setInt(1, tid);
+                pstmt.setInt(2, tid);
+                pstmt.setInt(3, tid);
+                ResultSet resultSet = pstmt.executeQuery();
+                ResultSetMetaData rsmd = resultSet.getMetaData();
+                Integer getColumnCount = rsmd.getColumnCount();
+                if(!resultSet.isBeforeFirst()){
+                    System.out.println("No record found");
+                }
+                else{
+                    //print header
+                    System.out.println("Trip ID, Driver Name, Vehicle ID, Vehicle Model, Start, End, Fee, Rating");
+                    //print all record
+                    while(resultSet.next()){
+                        StringBuilder record = new StringBuilder();
+                        Boolean first1 = true;
+                        for (int i = 1; i <= getColumnCount; i++ ) {
+                            String col = resultSet.getString(i);
+
+                            if(first1 == true){
+                                first1 = false;
+                                record.append(col);
+                            }
+                            else{
+                                record.append(", ");
+                                record.append(col);
+                            }
                         }
-                        else{
-                            record.append(", ");
-                            record.append(col);
-                        }
+
+                        System.out.println(record.toString());
+
                     }
-
-                    System.out.println(record.toString());
-
                 }
             }
-
             conn.close();
         }
         //catch(ClassNotFoundException e){
