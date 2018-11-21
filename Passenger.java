@@ -464,15 +464,16 @@ class Passenger{
             tmp_stmt.executeUpdate();
 
             String sql =
-            "SELECT Trip.id as Trip_ID, Driver.name as Driver_Name,"
-            +"Vehicle.id as Vehicle_ID, Vehicle.model as Vehicle_model,"
-            +"Trip.Start as Start, Trip.End as End, Trip.fee as Fee, Trip.rating as Rating\n"
-            +"FROM Trip, Driver, Vehicle\n"
-            +"WHERE Trip.id=?\n"
-            +";";
+            //"SELECT Trip.id as Trip_ID, Driver.name as Driver_Name,"
+            //+"Vehicle.id as Vehicle_ID, Vehicle.model as Vehicle_model,"
+            //+"Trip.Start as Start, Trip.End as End, Trip.fee as Fee, Trip.rating as Rating\n"
+            //+"FROM Trip, Driver, Vehicle\n"
+            //+"WHERE Trip.id=? AND Driver.id = Trip.did AND Driver.vid = Vehicle.id\n"
+            //+";";
+            "(SELECT Driver.vid FROM Driver, Vehicle WHERE Driver.id = (SELECT Trip.did FROM Trip WHERE id = ?)),Trip WHERE id=?;"
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, tid);
-            //pstmt.setInt(2, pid);
+            pstmt.setInt(2, tid);
             ResultSet resultSet = pstmt.executeQuery();
             ResultSetMetaData rsmd = resultSet.getMetaData();
             Integer getColumnCount = rsmd.getColumnCount();
