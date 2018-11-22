@@ -53,10 +53,11 @@ class Driver{
         scanner.close();
     }
     public static void Take_request() {
-        
+        Integer tripid = 0;
         Integer input = 0;
         Integer did = 0;
         Integer rid = 0;
+        String start = "0000-00-00 00:00:00";
         String start_date = "0000-00-00";
         String end_date = "0000-00-00";
         String input_err = "[ERROR] Invalid input.";
@@ -91,7 +92,7 @@ class Driver{
                 
                 PreparedStatement pstmt = conn.prepareStatement(sql);
                 pstmt.setInt(1, did);
-                System.out.println(pstmt);
+                //System.out.println(pstmt);
                 ResultSet resultSet = pstmt.executeQuery();
                 
                 if(!resultSet.isBeforeFirst())
@@ -129,9 +130,53 @@ class Driver{
             }
         }
 
+
+        String sql1 = "SELECT Passenger.id, Passenger.name, Request.passenger FROM Request, Passenger" 
+        +" WHERE Request.id = ? AND Request.pid = Passenger.id";
+            Integer j = 0;
+            String k = "";
+            Integer l = 0;
+
+        PreparedStatement pstmt1 = conn.prepareStatement(sql1);
+                pstmt.setInt(1, rid);
+               // System.out.println(pstmt1);
+                ResultSet resultSet1 = pstmt1.executeQuery();
+                while(resultSet1.next()){
+                    j = resultSet1.getInt(1);
+                    k = resultSet1.getString(2);
+                    l = resultSet1.getInt(3);
+                
                 }
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	            Date date = new Date();
+                start = df.format(date); 
+        String sql2 = "INSERT INTO Trip(did,pid,start) VALUES(?,?,?);";
+        PreparedStatement pstmt2 = conn.prepareStatement(sql2);
+       // System.out.println(pstmt2);
+                pstmt2.setInt(1,did);
+                pstmt2.setInt(2,j);
+                pstmt2.setString(3,start);
+                try{
+                 pstmt2.executeUpdate();
+                 ResultSet GeneratedKeys = pstmt2.getGeneratedKeys();
+                 tripid = GeneratedKeys.getInt(1);
+
+                }
+                catch(SQLException e){
+                System.out.println("[ERROR]: Cannot insert data!!");
+
+                }
+                System.out.println("Trip ID, Passenger name, Start");
+                StringBuilder record1 = new StringBuilder();
+                record1.append(tripid);
+                record1.append(", ");
+                record1.append(k);
+                record1.append(", ");
+                record1.append(start);
+                System.out.println(record1.toString());
                 conn.close();
         }
+    }
         catch(ClassNotFoundException e){
             System.out.println("[ERROR]: java MYSQL DB Driver nSot found !!");
         }
