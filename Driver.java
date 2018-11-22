@@ -3,6 +3,8 @@ import java.util.Scanner;
 import java.sql.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+
 class Driver{
     public static void list(){
         Integer input = 0;
@@ -73,8 +75,46 @@ class Driver{
                 input = 0;
             }
         }
-        input = 0;
-        while (input <= 0){
+        
+        try{
+            String dbAddress = "jdbc:mysql://projgw.cse.cuhk.edu.hk:2633/db12";
+            String dbUsername = "Group12";
+            String dbPassword = "apple";
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection conn = DriverManager.getConnection(dbAddress, dbUsername, dbPassword);
+            
+                String sql = "SELECT Request.id as Request_ID, Passenger.name as Passenger_Name," 
+                +"Request.passengers as Passenger\n"
+                +"FROM Request, Passenger, Driver, Vehicle\n"
+                +"WHERE Driver.id = ? AND Vehicle.id = Driver.vid AND Passenger.id = Request.pid AND Vehicle.seats >= Request.passengers" 
+                +" AND Vehicle.model_year >= Request.model_year AND Request.taken IS NULL AND Vehicle.model LIKE CONCAT('%',Request.model,'%');\n";
+                
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                pstmt.setInt(1, did);
+                System.out.println(pstmt);
+                ResultSet resultSet = pstmt.executeQuery();
+                
+                if(!resultSet.isBeforeFirst())
+                System.out.println("No records found.");
+                else{
+                    StringBuilder record = new StringBuilder();
+                    System.out.println("Request ID, Passenger name, Passenger");
+                    while(resultSet.next()){
+                        Integer i = resultSet.getInt(1);
+                        String passname = resultSet.getString(2);
+                        Integer ppl = resultSet.getInt(3);
+
+                        record.append(i);
+                        record.append(", ");
+                        record.append(passname);
+                        record.append(", ");
+                        record.append(ppl);
+                        record.append("\n");
+                        
+                    }
+                    System.out.println(record.toString());
+                    input = 0;
+             while (input <= 0){
             System.out.println("Please enter the request ID.");
             try{
                 String line = scanner.nextLine();
@@ -89,30 +129,6 @@ class Driver{
             }
         }
 
-        try{
-            String dbAddress = "jdbc:mysql://projgw.cse.cuhk.edu.hk:2633/db12";
-            String dbUsername = "Group12";
-            String dbPassword = "apple";
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection conn = DriverManager.getConnection(dbAddress, dbUsername, dbPassword);
-
-                String sql = "SELECT Request.id as Request_ID, Passenger.name as Passenger_Name," 
-                +"Request.passengers as Passenger\n"
-                +"FROM Request, Passenger, Driver, Vehicle\n"
-                +"WHERE  Driver.id = ? AND Driver.vid=Vehicle.id AND Vehicle.seats >= Request.passengers" 
-                +"AND Vehicle.model = Request.model\n";
-                
-                PreparedStatement pstmt = conn.prepareStatement(sql);
-                pstmt.setInt(1, did);
-   
-                ResultSet resultSet = pstmt.executeQuery();
-                if(!resultSet.isBeforeFirst())
-                System.out.println("No records found.");
-                else{
-                    while(resultSet.next()){
-                        Integer i = resultSet.getInt(1);
-                        System.out.println(i);
-                    }
                 }
                 conn.close();
         }
@@ -130,8 +146,9 @@ class Driver{
         Integer input = 0;
         Integer did = 0;
         Integer pid = 0;
+        Integer tripid = 0;
         String choose = "";
-        String end = "";
+        String end = "0000-00-00 00-00-00";
         String start_date = "0000-00-00";
         String end_date = "0000-00-00";
         String input_err = "[ERROR] Invalid input.";
@@ -178,7 +195,7 @@ class Driver{
                     StringBuilder record = new StringBuilder();
 
                     for (int i = 1; i <= getColumnCount; i++ ) {
-                        Integer tripid = resultSet.getInt(1);
+                        tripid = resultSet.getInt(1);
                         Integer passgeid = resultSet.getInt(2);
                         String starttime = resultSet.getString(3);
 
@@ -218,10 +235,11 @@ class Driver{
                 DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	            Date date = new Date();
                 end = df.format(date); //2016/11/16 12:08:43
+
                 String set_end = "UPDATE Trip SET Trip.end = ? WHERE Trip.id = ?";
                 PreparedStatement setting = conn.prepareStatement(set_end);
                 setting.setString(1, end);
-                setting.setString(2, tripid);
+                setting.setInt(2, tripid);
 
                 String finish = "SELECT Trip.id, Passenger.name, Trip.start, Trip.end FROM Passenger, Trip WHERE Trip.did = ? AND Trip.pid = Passenger.id";
                 
@@ -230,7 +248,7 @@ class Driver{
             
             ResultSet resultSet1 = print.executeQuery();
             ResultSetMetaData rsmd1 = resultSet1.getMetaData();
-            Integer getColumn = rsmd.getColumnCount();
+            Integer getColumn = rsmd1.getColumnCount();
                 if(!resultSet1.isBeforeFirst())
                     System.out.println("No record found");
                 else{
@@ -279,29 +297,99 @@ class Driver{
         list();
     }
 
-    
+
     public static void Check_rating() {
         
         Integer input = 0;
         Integer pid = 0;
         Integer did = 0;
+        Double avg = 0.0;
+        Integer rating = 0;
         String start_date = "0000-00-00";
         String end_date = "0000-00-00";
         String input_err = "[ERROR] Invalid input.";
         Scanner scanner = new Scanner(System.in);
-        while (input <= 0){
-            System.out.println("Please enter your ID.");
-            try{
-                String line2 = scanner.nextLine();
-                Scanner validate = new Scanner(line2);
-                input = validate.nextInt();
-                validate.close();
-                did = input;
-            } catch(Exception e){
-                System.out.println(input_err);
-                input = 0;
-            }
-        }
+        // while (input <= 0){
+        //     System.out.println("Please enter your ID.");
+        //     try{
+        //         String line2 = scanner.nextLine();
+        //         Scanner validate = new Scanner(line2);
+        //         input = validate.nextInt();
+        //         validate.close();
+        //         did = input;
+        //     } catch(Exception e){
+        //         System.out.println(input_err);
+        //         input = 0;
+        //     }
+        //     try{
+        //         String dbAddress = "jdbc:mysql://projgw.cse.cuhk.edu.hk:2633/db12";
+        //         String dbUsername = "Group12";
+        //         String dbPassword = "apple";
+        //         Class.forName("com.mysql.jdbc.Driver");
+        //         Connection conn = DriverManager.getConnection(dbAddress, dbUsername, dbPassword);
+        //         String sql = "SELECT Trip.rating\n " 
+        //         +"FROM Trip \n"
+        //         +"WHERE Trip.did = ?\n" 
+        //         +"LIMIT 5";
+                   
+        //         PreparedStatement pstmt = conn.prepareStatement(sql);
+        //         pstmt.setInt(1, did);
+                
+        //         ResultSet resultSet = pstmt.executeQuery();
+        //         ResultSetMetaData rsmd = resultSet.getMetaData();
+        //         Integer getCoulumnCount = rsmd.getColumnCount();
+        //         System.out.printIn("%d",getCoulumnCount);
+        //             if(!resultSet.isBeforeFirst())
+        //                 System.out.println("No record found");
+        //             else{
+
+        //                 if(getColumnCount.equal("5")){
+        //                 for (int i = 1; i <= getColumnCount; i++ ){
+        //                     Integer rate = resultSet.getInt(1);
+        //                     rating += rate;
+        //                 }
+        //                 avg = rating/5.0;
+        //                 String avg_str = avg.toString();
+        //                 System.out.printIn("Your driver rating is %.1f ",avg);
+        //             }
+        //                 else{
+        //                     System.out.println("driver rating is not yet determined.");
+
+        //                 }
+                        
+        //             }
+
+                        
+        //             //print header
+        //             System.out.println("Trip ID, Passenger ID, Start");
+                    
+        //             while(resultSet.next()){
+    
+        //                 StringBuilder record = new StringBuilder();
+    
+        //                 for (int i = 1; i <= getColumnCount; i++ ) {
+        //                     Integer tripid = resultSet.getInt(1);
+        //                     Integer passgeid = resultSet.getInt(2);
+        //                     String starttime = resultSet.getString(3);
+    
+        //                         record.append(tripid);
+        //                         record.append(", ");
+        //                         record.append(passgeid);
+        //                         record.append(", ");
+        //                         record.append(starttime);
+        //                     }
+    
+        //                 System.out.println(record.toString());
+        //             }
+        //         }
+            
+        //     catch(Exception e){
+        //         System.out.println(input_err);
+        //         input = 0;
+        //     }
+            
+
+        // }
         list();
     }
     public static void Go_back() {

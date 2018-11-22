@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS Trip(
 
 CREATE TABLE IF NOT EXISTS Request(
     id integer primary key AUTO_INCREMENT,
+    pid integer,
     taken integer,
     model_year integer(4),
     model varchar(30),

@@ -256,7 +256,7 @@ class Passenger{
             //ResultSet resultSet = pstmt.executeQuery();
             if(Available_Driver > 0){
 
-                String addRequest = "INSERT INTO Request(model_year,model,passengers) VALUES(?,?,?);";
+                String addRequest = "INSERT INTO Request(model_year,model,passengers,pid) VALUES(?,?,?,?);";
                 PreparedStatement ps = conn.prepareStatement(addRequest);
                 if (model_year.equals("") || model_year.equals(" ")){
                     ps.setNull(1,Types.INTEGER);
@@ -271,6 +271,7 @@ class Passenger{
                     ps.setString(2, model);
                 }
                 ps.setInt(3,numPass);
+                ps.setInt(4,pid);
                 ps.executeUpdate();
 
                 System.out.println(
