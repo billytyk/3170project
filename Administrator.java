@@ -106,6 +106,7 @@ public class Administrator{
                 stmt.executeBatch();
                 //con.commit();
                 System.out.println("Create table success");
+                bf.close();
             }
             catch(FileNotFoundException e){
                 System.out.println(e);
@@ -166,6 +167,7 @@ public class Administrator{
                     line = bf.readLine();
                 }
                 System.out.println("Delete table success");
+                bf.close();
 
             }
             catch(FileNotFoundException e){

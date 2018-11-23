@@ -59,8 +59,8 @@ class Driver{
         Integer did = 0;
         Integer rid = 0;
         String start = "0000-00-00 00:00:00";
-        String start_date = "0000-00-00";
-        String end_date = "0000-00-00";
+        //String start_date = "0000-00-00";
+        //String end_date = "0000-00-00";
         String input_err = "[ERROR] Invalid input.";
         Scanner scanner = new Scanner(System.in);
 
@@ -118,7 +118,7 @@ class Driver{
                 pstmt.setInt(4, did);
                
                 ResultSet resultSet = pstmt.executeQuery();
-                
+               // System.out.println(resultSet);
                 if(!resultSet.isBeforeFirst())
                 System.out.println("No records found.");
                 else{
@@ -147,6 +147,7 @@ class Driver{
                 input = validate.nextInt();
                 validate.close();
                 rid = input;
+                System.out.println(rid);
               
             } catch(Exception e){
                 System.out.println(input_err);
@@ -155,7 +156,7 @@ class Driver{
         }
 
 
-        String sql1 = "SELECT Passenger.id, Passenger.name, Request.passenger FROM Request, Passenger" 
+        String sql1 = "SELECT Passenger.id, Passenger.name, Request.passengers FROM Request, Passenger" 
         +" WHERE Request.id = ? AND Request.pid = Passenger.id";
             Integer j = 0;
             String k = "";
@@ -172,6 +173,7 @@ class Driver{
                     System.out.println(did.toString()+j.toString()+k+l.toString());
                 
                 }
+              
                 DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	            Date date = new Date();
                 start = df.format(date); 
@@ -220,19 +222,19 @@ class Driver{
         catch(SQLException e){
             System.out.println(e);
         }
-
+        scanner.close();
         list();
     }
 
     public static void Finish_trip() {
         Integer input = 0;
         Integer did = 0;
-        Integer pid = 0;
+        //Integer pid = 0;
         Integer tripid = 0;
         String choose = "";
         String end = "0000-00-00 00-00-00";
         String start_date = "0000-00-00";
-        String end_date = "0000-00-00";
+        //String end_date = "0000-00-00";
         String input_err = "[ERROR] Invalid input.";
         Scanner scanner = new Scanner(System.in);
         Database db = new Database();
@@ -412,7 +414,7 @@ class Driver{
     public static void Check_rating() {
         
         Integer input = 0;
-        Integer pid = 0;
+        //Integer pid = 0;
         Integer did = 0;
         Double avg = 0.0;
         Integer rating = 0;

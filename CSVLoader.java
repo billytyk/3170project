@@ -61,14 +61,14 @@ class CSVLoader {
 		}
 
         //String firstrow = csvReader.readLine();
-        System.out.println(SQL_INSERT);
+        //System.out.println(SQL_INSERT);
 
 		// String questionmarks = StringUtils.repeat("?,", headerRow.length);
 		// questionmarks = (String) questionmarks.subSequence(0, questionmarks
 		// 		.length() - 1);
 
         String query = SQL_INSERT.replaceFirst(TABLE_REGEX, tableName);
-        System.out.println(query);
+        //System.out.println(query);
 		// query = query
         // 		.replaceFirst(KEYS_REGEX, StringUtils.join(headerRow, ","));
         StringBuilder questionmark = new StringBuilder();
@@ -84,8 +84,8 @@ class CSVLoader {
             questionmark.append("?");
             attr.append(attributes[i]);
         }
-        System.out.println(questionmark.toString());
-        System.out.println(attr.toString());
+        //System.out.println(questionmark.toString());
+        //System.out.println(attr.toString());
         query = query.replaceFirst(KEYS_REGEX, attr.toString());
         query = query.replaceFirst(VALUES_REGEX, questionmark.toString()) ;
         //System.out.println(query);
@@ -105,9 +105,9 @@ class CSVLoader {
 		 		con.createStatement().execute("DELETE FROM " + tableName + ";");
 		 	}
 
-		 	 final int batchSize = 1000;
-		 	 int count = 0;
-             Date date = null;
+		 	 //final int batchSize = 1000;
+		 	 //int count = 0;
+             //Date date = null;
              //String nextLine = "";
 		 	 while ((nextLine = csvReader.readLine()) != null) {
 
@@ -116,7 +116,7 @@ class CSVLoader {
                     String[] values = nextLine.split(",");
                     //StringJoiner sj = new StringJoiner(",");
                     for(int i = 0; i< values.length; i++){
-                        String string = String.format("\"%s\"", values[i]);
+                        //String string = String.format("\"%s\"", values[i]);
                         //sj.add(string);
                         ps.setString(i+1, values[i]);
                     }
