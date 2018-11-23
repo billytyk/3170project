@@ -89,15 +89,9 @@ class Driver{
                 +"Request.passengers as Passenger\n"
                 +"FROM Request, Passenger, Driver, Vehicle\n"
                 +"WHERE Driver.id = ? AND Vehicle.id = Driver.vid AND Passenger.id = Request.pid AND Vehicle.seats >= Request.passengers" 
-<<<<<<< HEAD
                 +" AND (Request.model_year IS NULL OR Vehicle.model_year >= Request.model_year) AND Request.taken IS NULL AND (Vehicle.model IS NULL OR Vehicle.model LIKE CONCAT('%',Request.model,'%')) ;\n";
-=======
-<<<<<<< HEAD
-                +" AND Vehicle.model_year >= Request.model_year AND Request.taken IS NULL AND (Vehicle.model LIKE CONCAT('%',Request.model,'%') OR Request.model IS NULL OR Request.model_year IS NULL);\n";
-=======
-                +" AND (Vehicle.model_year >= Request.model_year OR Request.model_year = NULL) AND Request.taken IS NULL AND (Vehicle.model LIKE CONCAT('%',Request.model,'%') OR Vehicle.model = NULL) ;\n";
->>>>>>> 04fe4c337ca47fdcb4de72d963f518d36a38e5cd
->>>>>>> abf24e498c32420cba2eadad104be406665e2297
+                
+
                 
                 PreparedStatement pstmt = conn.prepareStatement(sql);
                 pstmt.setInt(1, did);
