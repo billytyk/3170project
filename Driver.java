@@ -356,87 +356,70 @@ class Driver{
         String end_date = "0000-00-00";
         String input_err = "[ERROR] Invalid input.";
         Scanner scanner = new Scanner(System.in);
-        // while (input <= 0){
-        //     System.out.println("Please enter your ID.");
-        //     try{
-        //         String line2 = scanner.nextLine();
-        //         Scanner validate = new Scanner(line2);
-        //         input = validate.nextInt();
-        //         validate.close();
-        //         did = input;
-        //     } catch(Exception e){
-        //         System.out.println(input_err);
-        //         input = 0;
-        //     }
-        //     try{
-        //         String dbAddress = "jdbc:mysql://projgw.cse.cuhk.edu.hk:2633/db12";
-        //         String dbUsername = "Group12";
-        //         String dbPassword = "apple";
-        //         Class.forName("com.mysql.jdbc.Driver");
-        //         Connection conn = DriverManager.getConnection(dbAddress, dbUsername, dbPassword);
-        //         String sql = "SELECT Trip.rating\n " 
-        //         +"FROM Trip \n"
-        //         +"WHERE Trip.did = ?\n" 
-        //         +"LIMIT 5";
-                   
-        //         PreparedStatement pstmt = conn.prepareStatement(sql);
-        //         pstmt.setInt(1, did);
+        
+        while (input <= 0){
+            System.out.println("Please enter your ID.");
+            try{
+                String line = scanner.nextLine();
+                Scanner validate = new Scanner(line);
+                input = validate.nextInt();
+                validate.close();
+                did = input;
+            } catch(Exception e){
+                System.out.println(input_err);
+                input = 0;
+            }
+        }
+
+        try{
+            Database db = new Database();
+            Connection con = db.getConnection();
+            String sql = "SELECT EXISTS(SELECT 1 FROM Driver WHERE Driver.id = ?);";
+            PreparedStatement pstmt = con.prepareStatement(sql);
+            pstmt.setInt(1,did);
+            ResultSet result = pstmt.executeQuery();
+            result.next();
+            Integer isDriverExist = result.getInt(1);
+            if(isDriverExist == 0){
+                System.out.println("No such driver record");
+                con.close();
+                list();
+            }
+
+            String sql2 = "SELECT AVG(selected_trips.rating) as avg_rating FROM (SELECT * FROM Trip as T\n"
+            +"WHERE T.did = ? AND 5 <= (SELECT COUNT(*) FROM Trip, Driver WHERE Driver.id = T.did AND Trip.did = Driver.id)\n"
+            +"ORDER BY T.id DESC LIMIT 5) as selected_trips;";
+            //System.out.println(sql2);
+            Connection con2 = db.getConnection();
+            PreparedStatement pstmt2 = con2.prepareStatement(sql2);
+            pstmt2.setInt(1,did);
+            ResultSet resultSet2 = pstmt2.executeQuery();
+            //System.out.println(resultSet2.isBeforeFirst());
+            if(!resultSet2.isBeforeFirst()){
+                System.out.println("Your rating is not yet determined");
+            }
+            else
+            {
+                resultSet2.next();
+                //avg = resultSet2.getDouble(1);
+                String gets = resultSet2.getString(1);
+                if(gets ==null)
+                    System.out.println("Your rating is not yet determined\n");
+                else{
+                    avg = Double.parseDouble(gets);
+                    System.out.printf("Your driving rating is %.2f\n\n", avg);
+                }
                 
-        //         ResultSet resultSet = pstmt.executeQuery();
-        //         ResultSetMetaData rsmd = resultSet.getMetaData();
-        //         Integer getCoulumnCount = rsmd.getColumnCount();
-        //         System.out.printIn("%d",getCoulumnCount);
-        //             if(!resultSet.isBeforeFirst())
-        //                 System.out.println("No record found");
-        //             else{
+            }
 
-        //                 if(getColumnCount.equal("5")){
-        //                 for (int i = 1; i <= getColumnCount; i++ ){
-        //                     Integer rate = resultSet.getInt(1);
-        //                     rating += rate;
-        //                 }
-        //                 avg = rating/5.0;
-        //                 String avg_str = avg.toString();
-        //                 System.out.printIn("Your driver rating is %.1f ",avg);
-        //             }
-        //                 else{
-        //                     System.out.println("driver rating is not yet determined.");
 
-        //                 }
-                        
-        //             }
+            con2.close();
+            con.close();
 
-                        
-        //             //print header
-        //             System.out.println("Trip ID, Passenger ID, Start");
-                    
-        //             while(resultSet.next()){
-    
-        //                 StringBuilder record = new StringBuilder();
-    
-        //                 for (int i = 1; i <= getColumnCount; i++ ) {
-        //                     Integer tripid = resultSet.getInt(1);
-        //                     Integer passgeid = resultSet.getInt(2);
-        //                     String starttime = resultSet.getString(3);
-    
-        //                         record.append(tripid);
-        //                         record.append(", ");
-        //                         record.append(passgeid);
-        //                         record.append(", ");
-        //                         record.append(starttime);
-        //                     }
-    
-        //                 System.out.println(record.toString());
-        //             }
-        //         }
-            
-        //     catch(Exception e){
-        //         System.out.println(input_err);
-        //         input = 0;
-        //     }
-            
-
-        // }
+        }
+        catch(SQLException e){
+            System.out.println(e);
+        }
         list();
     }
     public static void Go_back() {
