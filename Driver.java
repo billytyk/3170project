@@ -88,11 +88,11 @@ class Driver{
                 +"Request.passengers as Passenger\n"
                 +"FROM Request, Passenger, Driver, Vehicle\n"
                 +"WHERE Driver.id = ? AND Vehicle.id = Driver.vid AND Passenger.id = Request.pid AND Vehicle.seats >= Request.passengers" 
-                +" AND Vehicle.model_year >= Request.model_year AND Request.taken IS NULL AND Vehicle.model LIKE CONCAT('%',Request.model,'%');\n";
+                +" AND (Vehicle.model_year >= Request.model_year OR Request.model_year = NULL) AND Request.taken IS NULL AND (Vehicle.model LIKE CONCAT('%',Request.model,'%') OR Vehicle.model = NULL) ;\n";
                 
                 PreparedStatement pstmt = conn.prepareStatement(sql);
                 pstmt.setInt(1, did);
-                //System.out.println(pstmt);
+               
                 ResultSet resultSet = pstmt.executeQuery();
                 
                 if(!resultSet.isBeforeFirst())
@@ -123,6 +123,7 @@ class Driver{
                 input = validate.nextInt();
                 validate.close();
                 rid = input;
+                System.out.println(rid);
               
             } catch(Exception e){
                 System.out.println(input_err);
@@ -131,14 +132,14 @@ class Driver{
         }
 
 
-        String sql1 = "SELECT Passenger.id, Passenger.name, Request.passenger FROM Request, Passenger" 
+        String sql1 = "SELECT Passenger.id, Passenger.name, Request.passengers FROM Request, Passenger" 
         +" WHERE Request.id = ? AND Request.pid = Passenger.id";
             Integer j = 0;
             String k = "";
             Integer l = 0;
 
         PreparedStatement pstmt1 = conn.prepareStatement(sql1);
-                pstmt.setInt(1, rid);
+                pstmt1.setInt(1, rid);
                // System.out.println(pstmt1);
                 ResultSet resultSet1 = pstmt1.executeQuery();
                 while(resultSet1.next()){
@@ -147,6 +148,7 @@ class Driver{
                     l = resultSet1.getInt(3);
                 
                 }
+              
                 DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	            Date date = new Date();
                 start = df.format(date); 
@@ -160,7 +162,7 @@ class Driver{
                  pstmt2.executeUpdate();
                  ResultSet GeneratedKeys = pstmt2.getGeneratedKeys();
                  tripid = GeneratedKeys.getInt(1);
-
+                 System.out.println(GeneratedKeys);
                 }
                 catch(SQLException e){
                 System.out.println("[ERROR]: Cannot insert data!!");
