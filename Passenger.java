@@ -468,7 +468,7 @@ class Passenger{
                 System.out.println("No record found");
             }
             else{
-                String tmp_sql = "UPDATE Trip SET rating=? WHERE id=? AND pid=?;";
+                String tmp_sql = "UPDATE Trip SET rating=? WHERE id=? AND pid=? AND end IS NOT NULL;";
                 PreparedStatement tmp_stmt = conn.prepareStatement(tmp_sql);
                 tmp_stmt.setInt(1, rate);
                 tmp_stmt.setInt(2, tid);

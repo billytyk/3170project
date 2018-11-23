@@ -4,6 +4,7 @@ import java.sql.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 class Driver{
     public static void list(){
@@ -88,7 +89,7 @@ class Driver{
                 +"Request.passengers as Passenger\n"
                 +"FROM Request, Passenger, Driver, Vehicle\n"
                 +"WHERE Driver.id = ? AND Vehicle.id = Driver.vid AND Passenger.id = Request.pid AND Vehicle.seats >= Request.passengers" 
-                +" AND Vehicle.model_year >= Request.model_year AND Request.taken IS NULL AND Vehicle.model LIKE CONCAT('%',Request.model,'%');\n";
+                +" AND Vehicle.model_year >= Request.model_year AND Request.taken IS NULL AND (Vehicle.model LIKE CONCAT('%',Request.model,'%') OR Request.model IS NULL OR Request.model_year IS NULL);\n";
                 
                 PreparedStatement pstmt = conn.prepareStatement(sql);
                 pstmt.setInt(1, did);
@@ -178,7 +179,7 @@ class Driver{
         }
     }
         catch(ClassNotFoundException e){
-            System.out.println("[ERROR]: java MYSQL DB Driver nSot found !!");
+            System.out.println("[ERROR]: java MYSQL DB Driver Sot found !!");
         }
         catch(SQLException e){
             System.out.println(e);
@@ -198,6 +199,7 @@ class Driver{
         String end_date = "0000-00-00";
         String input_err = "[ERROR] Invalid input.";
         Scanner scanner = new Scanner(System.in);
+        Database db = new Database();
         while (input <= 0){
             System.out.println("Please enter your ID.");
             try{
@@ -214,133 +216,161 @@ class Driver{
        
 
         try{
-            String dbAddress = "jdbc:mysql://projgw.cse.cuhk.edu.hk:2633/db12";
-            String dbUsername = "Group12";
-            String dbPassword = "apple";
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection conn = DriverManager.getConnection(dbAddress, dbUsername, dbPassword);
+            Connection conn = db.getConnection();
             String sql = "SELECT Trip.id as Trip_ID, Trip.pid as Passenger_ID,Trip.start as Start\n" 
             +"FROM Trip \n"
-            +"WHERE Trip.did = ? AND Trip.end IS NULL\n;" ;
+            +"WHERE Trip.did = ? AND Trip.end IS NULL\n" 
+            +"ORDER BY Trip.id DESC LIMIT 1\n;" ;
                
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, did);
             
             ResultSet resultSet = pstmt.executeQuery();
-            ResultSetMetaData rsmd = resultSet.getMetaData();
-            Integer getColumnCount = rsmd.getColumnCount();
-                if(!resultSet.isBeforeFirst())
-                    System.out.println("No record found");
-                else{
-                //print header
-                System.out.println("Trip ID, Passenger ID, Start");
+
+            if(!resultSet.isBeforeFirst()){
+                System.out.println("No record found");
+                conn.close();
+                list();
+            }
+            else{
+                StringBuilder record = new StringBuilder();
+                resultSet.next();
+                tripid = resultSet.getInt(1);
+                Integer passgeid = resultSet.getInt(2);
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                //Date date = new Date();
+                Date starttime = resultSet.getDate(3);
+                start_date = df.format(starttime);
                 
-                while(resultSet.next()){
+                record.append(tripid);
+                record.append(", ");
+                record.append(passgeid);
+                record.append(", ");
+                record.append(start_date);
 
-                    StringBuilder record = new StringBuilder();
-
-                    for (int i = 1; i <= getColumnCount; i++ ) {
-                        tripid = resultSet.getInt(1);
-                        Integer passgeid = resultSet.getInt(2);
-                        String starttime = resultSet.getString(3);
-
-                            record.append(tripid);
-                            record.append(", ");
-                            record.append(passgeid);
-                            record.append(", ");
-                            record.append(starttime);
-                        }
-
-                    System.out.println(record.toString());
-                }
+                System.out.println("Trip ID, Passenger ID, Start");
+                System.out.println(record.toString());
+            }
+            conn.close();
+        }
+        catch(SQLException e){
+            System.out.println(e);
             }
 
-            input = 0;
+
+
+        input = 0;
         while (input<=0){
-            System.out.println("Do you wish to finish the trip.");
+            System.out.println("Do you wish to finish the trip.[y/n]");
             try{
                 String line1 = scanner.nextLine();
-                ////Scanner validate = new Scanner(line);
-                //input = validate.nextInt();
-                
+                // Scanner validate = new Scanner(line1);
+                // line1 = validate.nextLine();
                 //validate.close();
                 if(line1.equals("y")||line1.equals("n")){
-                choose = line1;
-                input = 1;
+                    
+                    choose = line1;
+                    System.out.println(choose);
+                    input = 1;
+                }
+                else{
+                    System.out.println(input_err);
                 }
 
             }
-           
+        
             catch(Exception e){
+                System.out.println(e);
                 System.out.println(input_err);
                 input = 0;
             }
 
-            if (choose.equals("y")) {
-                DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	            Date date = new Date();
-                end = df.format(date); //2016/11/16 12:08:43
 
-                String set_end = "UPDATE Trip SET Trip.end = ? WHERE Trip.id = ?";
-                PreparedStatement setting = conn.prepareStatement(set_end);
-                setting.setString(1, end);
-                setting.setInt(2, tripid);
-
-                String finish = "SELECT Trip.id, Passenger.name, Trip.start, Trip.end FROM Passenger, Trip WHERE Trip.did = ? AND Trip.pid = Passenger.id";
-                
-                PreparedStatement print = conn.prepareStatement(finish);
-                print.setInt(1, did);
+        }
+        
+        if (choose.equals("y")) {
             
-            ResultSet resultSet1 = print.executeQuery();
-            ResultSetMetaData rsmd1 = resultSet1.getMetaData();
-            Integer getColumn = rsmd1.getColumnCount();
-                if(!resultSet1.isBeforeFirst())
-                    System.out.println("No record found");
-                else{
-                //print header
+            
+            try{
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date date = new Date();
+            end = df.format(date); //2016/11/16 12:08:43
+            Database db2 = new Database();
+            Connection conn2 = db2.getConnection();
+            
+
+            if(null != conn2){
+
+
+                String finish = "SELECT Trip.id, Passenger.name, Trip.start, Trip.end FROM Passenger, Trip WHERE Trip.id = ? AND Passenger.id = Trip.pid LIMIT 1";
+                
+                PreparedStatement print = conn2.prepareStatement(finish);
+                print.setInt(1, tripid);
+                
+                ResultSet resultSet1 = print.executeQuery();
+                resultSet1.next();
+
+
+
+                StringBuilder record1 = new StringBuilder();
+                Integer tripid1 = resultSet1.getInt(1);
+                String passgename = resultSet1.getString(2);
+                String starttime1 = resultSet1.getTimestamp(3).toString();
+                //String endtime = resultSet1.getString(4);
+                record1.append(tripid1);
+                record1.append(", ");
+                record1.append(passgename);
+                record1.append(", ");
+                record1.append(starttime1);
+                record1.append(", ");
+                record1.append(end);
+
+                
+                // //df.parse(starttime1);
+                //Date cal_end = new Date(resultSet1.getTimestamp(3).getTime());
+                
+                Long diff = date.getTime() - resultSet1.getTimestamp(3).getTime();
+                Long minutes = TimeUnit.MILLISECONDS.toMinutes(diff);
+
+                System.out.println("choose=y");
+                System.out.println(minutes);
+                
+            
+                String set_end = "UPDATE Trip SET Trip.end = ?, Trip.fee = ? WHERE Trip.id = ?";
+                PreparedStatement setting = conn2.prepareStatement(set_end);
+                setting.setString(1, end);
+                setting.setLong(2, minutes);
+                setting.setInt(3, tripid);
+                setting.executeUpdate();
+                
                 System.out.println("Trip ID, Passenger Name, Start, End, Fee");
-                
-                while(resultSet1.next()){
-
-                    StringBuilder record1 = new StringBuilder();
-
-                    for (int i = 1; i <= getColumn; i++ ) {
-                        Integer tripid1 = resultSet1.getInt(1);
-                        String passgename = resultSet1.getString(2);
-                        String starttime1 = resultSet1.getString(3);
-                        String endtime = resultSet1.getString(4);
-
-                            record1.append(tripid1);
-                            record1.append(", ");
-                            record1.append(passgename);
-                            record1.append(", ");
-                            record1.append(starttime1);
-                            record1.append(", ");
-                            record1.append(endtime);
-                        }
-
-                    System.out.println(record1.toString());
-                }
+                System.out.println(record1.toString());
+                conn2.close();
             }
-
-
-                
+            else{
+                System.out.println("NULL connection");
+                list();
             }
         }
+            catch(Exception e){
+                System.out.println(e);
+            }
+            list();
+
+        }
+            else{
+                System.out.println("You declined to finish the trip");
+                list();
+            }
 
        // SELECT Passenger.name FROM Passenger, Trip WHERE Trip.did = 1 AND Trip.pid = Passenger.id;
-
-                conn.close();
+       scanner.close();
+       list();
+                
         }
-        catch(ClassNotFoundException e){
-            System.out.println("[ERROR]: java MYSQL DB Driver not found !!");
-        }
-        catch(SQLException e){
-            System.out.println(e);
-        }
-
-        list();
-    }
+        
+   
+       
 
 
     public static void Check_rating() {
