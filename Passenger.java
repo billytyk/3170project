@@ -75,16 +75,16 @@ class Passenger{
         // Please enter the number of passengers
         input = 0;
         while (input <= 0){
-            System.out.println("Please enter the number of passengers.");
+            System.out.println("Please enter the number of passenger.");
             try{
                 String line = scanner.nextLine();
                 Scanner validate = new Scanner(line);
                 input = validate.nextInt();
                 validate.close();
                 // System.out.println(input);
-                if (input > 8 || input < 3){
+                if (input > 8 || input < 1){
                     input = 0;
-                    System.out.println("Seats number should be between 3 and 8!!!!");
+                    System.out.println("Please enter valid number of passenger");
                 }
                 else {
                     numPass = input;
@@ -282,17 +282,19 @@ class Passenger{
             else{
                 System.out.println("No matched result found.Please adjust your criterion.");
             }
-
+            //scanner.close();
             conn.close();
         }
 
-        catch(SQLException e){
+        catch(Exception e){
             System.out.println(e);
+            System.exit(0);
         }
 
 
-        //scanner.close();
+        scanner.close();
         list();
+        System.exit(0);
 
     }
     public static void Check_records() {
@@ -462,8 +464,8 @@ class Passenger{
             try_stmt.setInt(1, tid);
             try_stmt.setInt(2, pid);
             ResultSet trySet = try_stmt.executeQuery();
-            ResultSetMetaData try_rsmd = trySet.getMetaData();
-            Integer trygetColumnCount = try_rsmd.getColumnCount();
+            //ResultSetMetaData try_rsmd = trySet.getMetaData();
+            //Integer trygetColumnCount = try_rsmd.getColumnCount();
             if(!trySet.isBeforeFirst()){
                 System.out.println("No record found");
             }
