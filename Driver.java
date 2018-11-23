@@ -88,13 +88,13 @@ class Driver{
                 +"Request.passengers as Passenger\n"
                 +"FROM Request, Passenger, Driver, Vehicle\n"
                 +"WHERE Driver.id = ? AND Vehicle.id = Driver.vid AND Passenger.id = Request.pid AND Vehicle.seats >= Request.passengers" 
-                +" AND (Vehicle.model_year >= Request.model_year OR Request.model_year = NULL) AND Request.taken IS NULL AND (Vehicle.model LIKE CONCAT('%',Request.model,'%') OR Vehicle.model = NULL) ;\n";
+                +" AND (Request.model_year IS NULL OR Vehicle.model_year >= Request.model_year) AND Request.taken IS NULL AND (Vehicle.model IS NULL OR Vehicle.model LIKE CONCAT('%',Request.model,'%')) ;\n";
                 
                 PreparedStatement pstmt = conn.prepareStatement(sql);
                 pstmt.setInt(1, did);
                
                 ResultSet resultSet = pstmt.executeQuery();
-                
+               // System.out.println(resultSet);
                 if(!resultSet.isBeforeFirst())
                 System.out.println("No records found.");
                 else{
