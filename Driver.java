@@ -53,14 +53,15 @@ class Driver{
 
         scanner.close();
     }
+
     public static void Take_request() {
         Integer tripid = 0;
         Integer input = 0;
         Integer did = 0;
         Integer rid = 0;
         String start = "0000-00-00 00:00:00";
-        //String start_date = "0000-00-00";
-        //String end_date = "0000-00-00";
+        String start_date = "0000-00-00";
+        String end_date = "0000-00-00";
         String input_err = "[ERROR] Invalid input.";
         Scanner scanner = new Scanner(System.in);
 
@@ -116,9 +117,9 @@ class Driver{
                 pstmt.setInt(2, did);
                 pstmt.setInt(3, did);
                 pstmt.setInt(4, did);
-               
+                System.out.println(pstmt);
                 ResultSet resultSet = pstmt.executeQuery();
-               // System.out.println(resultSet);
+                
                 if(!resultSet.isBeforeFirst())
                 System.out.println("No records found.");
                 else{
@@ -147,7 +148,6 @@ class Driver{
                 input = validate.nextInt();
                 validate.close();
                 rid = input;
-                System.out.println(rid);
               
             } catch(Exception e){
                 System.out.println(input_err);
@@ -170,10 +170,9 @@ class Driver{
                     j = resultSet1.getInt(1);
                     k = resultSet1.getString(2);
                     l = resultSet1.getInt(3);
-                    System.out.println(did.toString()+j.toString()+k+l.toString());
+                    //System.out.println(did.toString()+j.toString()+k+l.toString());
                 
                 }
-              
                 DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	            Date date = new Date();
                 start = df.format(date); 
@@ -185,8 +184,8 @@ class Driver{
                 pstmt2.setInt(2,j);
                 pstmt2.setString(3,start);
                 pstmt3.setInt(1,rid);
-                System.out.println(pstmt2);
-                System.out.println(pstmt2);
+                //System.out.println(pstmt2);
+                //System.out.println(pstmt2);
                 conn.setAutoCommit(false);
                 try{
                  
@@ -195,7 +194,7 @@ class Driver{
                  ResultSet GeneratedKeys = pstmt2.getGeneratedKeys();
                  GeneratedKeys.next();
                  tripid = GeneratedKeys.getInt(1);
-                 System.out.println(GeneratedKeys);
+                 //System.out.println(GeneratedKeys);
                  conn.commit();
                   
                 }
@@ -222,9 +221,10 @@ class Driver{
         catch(SQLException e){
             System.out.println(e);
         }
-        scanner.close();
+
         list();
     }
+
 
     public static void Finish_trip() {
         Integer input = 0;
@@ -262,17 +262,17 @@ class Driver{
                
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, did);
-            
+            System.out.println(pstmt);
             ResultSet resultSet = pstmt.executeQuery();
 
-            if(!resultSet.isBeforeFirst()){
+            if(!resultSet.next()){
                 System.out.println("No record found");
                 conn.close();
                 list();
             }
             else{
                 StringBuilder record = new StringBuilder();
-                resultSet.next();
+                //resultSet.next();
                 tripid = resultSet.getInt(1);
                 Integer passgeid = resultSet.getInt(2);
                 DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -308,7 +308,7 @@ class Driver{
                 if(line1.equals("y")||line1.equals("n")){
                     
                     choose = line1;
-                    System.out.println(choose);
+                    //System.out.println(choose);
                     input = 1;
                 }
                 else{
@@ -372,6 +372,8 @@ class Driver{
 
                 System.out.println("choose=y");
                 System.out.println(minutes);
+                record1.append(", ");
+                record1.append(minutes.toString());
                 
             
                 String set_end = "UPDATE Trip SET Trip.end = ?, Trip.fee = ? WHERE Trip.id = ?";
@@ -455,7 +457,7 @@ class Driver{
             String sql2 = "SELECT AVG(selected_trips.rating) as avg_rating FROM (SELECT * FROM Trip as T\n"
             +"WHERE T.did = ? AND 5 <= (SELECT COUNT(*) FROM Trip, Driver WHERE Driver.id = T.did AND Trip.did = Driver.id)\n"
             +"ORDER BY T.id DESC LIMIT 5) as selected_trips;";
-            //System.out.println(sql2);
+            System.out.println(sql2);
             Connection con2 = db.getConnection();
             PreparedStatement pstmt2 = con2.prepareStatement(sql2);
             pstmt2.setInt(1,did);

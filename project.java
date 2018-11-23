@@ -31,7 +31,8 @@ public class project {
                                 break;
                     case 3:   Driver.list();
                                 break;
-                    case 4:   input = 0;
+                    case 4:   System.out.println("Goodbye");
+                              System.exit(0);
                                 break;
                     default:    System.out.println(input_err);
                                 input = 0;

@@ -155,7 +155,7 @@ class Passenger{
                 pstmt.setString(1, "%"+model+"%");
                 pstmt.setString(2, model_year);
                 pstmt.setInt(3, numPass);
-                System.out.println(pstmt.toString());
+                //System.out.println(pstmt.toString());
                 ResultSet resultSet = pstmt.executeQuery();
                 if(!resultSet.isBeforeFirst())
                     System.out.println("No records found.");
@@ -182,7 +182,7 @@ class Passenger{
 
                 pstmt.setInt(2, numPass);
                 pstmt.setString(1, "%"+model+"%");
-                System.out.println(pstmt.toString());
+                //System.out.println(pstmt.toString());
 
                 ResultSet resultSet = pstmt.executeQuery();
                 if(!resultSet.isBeforeFirst())
@@ -194,13 +194,13 @@ class Passenger{
                     // }
                     resultSet.next();
                     Available_Driver = resultSet.getInt(1);
-                    System.out.println("Available Driver = "+ String.valueOf(Available_Driver));
+                    //System.out.println("Available Driver = "+ String.valueOf(Available_Driver));
                 }
                 //conn.close();
             }
             else if(!(model_year.isEmpty()||model_year.equals(" ")) && (model.isEmpty()||model.equals(" "))){
-                System.out.println("Only model_year");
-                System.out.println("Model + Model year");
+                //System.out.println("Only model_year");
+                //System.out.println("Model + Model year");
                 String sql = "SELECT COUNT(*)"
                 +"FROM (SELECT DISTINCT Vehicle.id as Car_id, Vehicle.model "
                 +"FROM Driver, Vehicle "
@@ -210,7 +210,7 @@ class Passenger{
 
                 pstmt.setString(1, model_year);
                 pstmt.setInt(2, numPass);
-                System.out.println(pstmt.toString());
+                //System.out.println(pstmt.toString());
 
                 ResultSet resultSet = pstmt.executeQuery();
                 if(!resultSet.isBeforeFirst())
@@ -222,7 +222,7 @@ class Passenger{
                     // }
                     resultSet.next();
                     Available_Driver = resultSet.getInt(1);
-                    System.out.println("Available Driver = "+ String.valueOf(Available_Driver));
+                    //System.out.println("Available Driver = "+ String.valueOf(Available_Driver));
                 }
                 //conn.close();
             }
@@ -236,7 +236,7 @@ class Passenger{
 
 
                 pstmt.setInt(1, numPass);
-                System.out.println(pstmt.toString());
+                //System.out.println(pstmt.toString());
 
                 ResultSet resultSet = pstmt.executeQuery();
                 if(!resultSet.isBeforeFirst())
@@ -272,6 +272,7 @@ class Passenger{
                 }
                 ps.setInt(3,numPass);
                 ps.setInt(4,pid);
+                //System.out.println(ps);
                 ps.executeUpdate();
 
                 System.out.println(
@@ -282,19 +283,17 @@ class Passenger{
             else{
                 System.out.println("No matched result found.Please adjust your criterion.");
             }
-            //scanner.close();
+
             conn.close();
         }
 
-        catch(Exception e){
+        catch(SQLException e){
             System.out.println(e);
-            System.exit(0);
         }
 
 
-        scanner.close();
-        list();
-        System.exit(0);
+        //scanner.close();
+    list();
 
     }
     public static void Check_records() {
