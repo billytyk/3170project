@@ -9,6 +9,8 @@ import java.util.Scanner;
 
 import javax.lang.model.util.ElementScanner6;
 
+import javafx.scene.shape.Path;
+
 import java.sql.*;
 
 
@@ -200,15 +202,41 @@ public class Administrator{
         try{
             Connection con = db.getConnection();
             CSVLoader loader = new CSVLoader(con);
-            String[] attributes = new String[] {"id", "name", "vid"};
-            loader.loadCSV("test_data/vehicles.csv", "Vehicle", 
+            //String[] attributes = new String[] {"id", "name", "vid"};
+            Scanner scanner = new Scanner(System.in);
+            String dir = "";
+
+            while(true){
+                System.out.println("Please enter the folder path");
+                try{
+                     dir = scanner.nextLine();
+                     break;
+                }
+                catch(Exception e){
+                    System.out.println(e);
+                }
+
+            }
+            System.out.println(System.getProperty("user.dir"));
+            File f = new File(System.getProperty("user.dir"), dir);
+
+            if(f.exists() && f.isDirectory()){
+            //System.out.println(f.getPath()+"/vehicles.csv");
+            System.out.println("Processing...");
+            loader.loadCSV(f.getPath()+"/vehicles.csv", "Vehicle", 
                 new String[] {"id", "model", "model_year", "seats"}, true);
-            loader.loadCSV("test_data/drivers.csv", "Driver", attributes, true);
-            loader.loadCSV("test_data/passengers.csv", "Passenger", new String[] {"id", "name"}, true);
-            loader.loadCSV("test_data/trips.csv", "Trip", 
+            loader.loadCSV(f.getPath()+"/drivers.csv", "Driver", new String[] {"id", "name", "vid"}, true);
+            loader.loadCSV(f.getPath()+"/passengers.csv", "Passenger", new String[] {"id", "name"}, true);
+            loader.loadCSV(f.getPath()+"/trips.csv", "Trip", 
                 new String[] {"id", "did", "pid", "start", "end", "fee", "rating"}, true);
+            System.out.println("Load Data Complete");
+            }
+            else{
+                System.out.println("No such folder");
+            }
             
             db.CloseConnection(con);
+            scanner.close();
         }
         catch(Exception e){
             System.out.println(e);

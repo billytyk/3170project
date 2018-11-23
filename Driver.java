@@ -85,15 +85,38 @@ class Driver{
             Class.forName("com.mysql.jdbc.Driver");
             Connection conn = DriverManager.getConnection(dbAddress, dbUsername, dbPassword);
             
-                String sql = "SELECT Request.id as Request_ID, Passenger.name as Passenger_Name," 
+                String sql = "SELECT * FROM( SELECT Request.id as Request_ID, Passenger.name as Passenger_Name,\n"
                 +"Request.passengers as Passenger\n"
                 +"FROM Request, Passenger, Driver, Vehicle\n"
-                +"WHERE Driver.id = ? AND Vehicle.id = Driver.vid AND Passenger.id = Request.pid AND Vehicle.seats >= Request.passengers" 
-                +" AND Vehicle.model_year >= Request.model_year AND Request.taken IS NULL AND (Vehicle.model LIKE CONCAT('%',Request.model,'%') OR Request.model IS NULL OR Request.model_year IS NULL);\n";
+                +"WHERE Driver.id = ? AND Vehicle.id = Driver.vid AND Passenger.id = Request.pid AND Vehicle.seats >= Request.passengers\n"
+                +"AND Request.taken IS NULL AND Request.model_year IS NULL AND Vehicle.model LIKE CONCAT('%',Request.model,'%') AND Request.model IS NOT NULL\n"
+                +"UNION\n"
+                +"SELECT Request.id as Request_ID, Passenger.name as Passenger_Name,\n"
+                +"Request.passengers as Passenger\n"
+                +"FROM Request, Passenger, Driver, Vehicle\n"
+                +"WHERE Driver.id = ? AND Vehicle.id = Driver.vid AND Passenger.id = Request.pid AND Vehicle.seats >= Request.passengers\n"
+                +"AND Request.taken IS NULL AND Request.model IS NULL AND Request.model_year IS NOT NULL AND Vehicle.model_year>= Request.model_year\n"
+                +"UNION\n"
+                +"SELECT Request.id as Request_ID, Passenger.name as Passenger_Name,\n"
+                +"Request.passengers as Passenger\n"
+                +"FROM Request, Passenger, Driver, Vehicle\n"
+                +"WHERE Driver.id = ? AND Vehicle.id = Driver.vid AND Passenger.id = Request.pid AND Vehicle.seats >= Request.passengers\n"
+                +"AND Vehicle.model LIKE CONCAT('%',Request.model,'%') AND Request.model IS NOT NULL\n"
+                +"AND Request.taken IS NULL AND Request.model_year IS NOT NULL AND Vehicle.model_year>= Request.model_year AND Vehicle.model LIKE CONCAT('%',Request.model,'%') AND Request.model IS NOT NULL\n"
+                +"UNION\n"
+                +"SELECT Request.id as Request_ID, Passenger.name as Passenger_Name,\n"
+                +"Request.passengers as Passenger\n"
+                +"FROM Request, Passenger, Driver, Vehicle\n"
+                +"WHERE Driver.id = ? AND Vehicle.id = Driver.vid AND Passenger.id = Request.pid AND Vehicle.seats >= Request.passengers\n"
+                +"AND Request.taken IS NULL AND Request.model_year IS NULL AND Request.model IS NULL) As temp\n"
+                +"ORDER BY temp.Request_ID;" ;
                 
                 PreparedStatement pstmt = conn.prepareStatement(sql);
                 pstmt.setInt(1, did);
-                //System.out.println(pstmt);
+                pstmt.setInt(2, did);
+                pstmt.setInt(3, did);
+                pstmt.setInt(4, did);
+               
                 ResultSet resultSet = pstmt.executeQuery();
                 
                 if(!resultSet.isBeforeFirst())
@@ -139,32 +162,45 @@ class Driver{
             Integer l = 0;
 
         PreparedStatement pstmt1 = conn.prepareStatement(sql1);
-                pstmt.setInt(1, rid);
-               // System.out.println(pstmt1);
+                pstmt1.setInt(1, rid);
                 ResultSet resultSet1 = pstmt1.executeQuery();
-                while(resultSet1.next()){
+               // System.out.println(pstmt1);
+                if(resultSet1.next()){
                     j = resultSet1.getInt(1);
                     k = resultSet1.getString(2);
                     l = resultSet1.getInt(3);
+                    System.out.println(did.toString()+j.toString()+k+l.toString());
                 
                 }
                 DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	            Date date = new Date();
                 start = df.format(date); 
-        String sql2 = "INSERT INTO Trip(did,pid,start) VALUES(?,?,?);";
-        PreparedStatement pstmt2 = conn.prepareStatement(sql2);
-       // System.out.println(pstmt2);
+                String sql2 = "INSERT INTO Trip(did,pid,start) VALUES(?,?,?);";
+                String sql3 = "DELETE FROM Request WHERE Request.id = ?;";
+                PreparedStatement pstmt2 = conn.prepareStatement(sql2,Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement pstmt3 = conn.prepareStatement(sql3);
                 pstmt2.setInt(1,did);
                 pstmt2.setInt(2,j);
                 pstmt2.setString(3,start);
+                pstmt3.setInt(1,rid);
+                System.out.println(pstmt2);
+                System.out.println(pstmt2);
+                conn.setAutoCommit(false);
                 try{
+                 
                  pstmt2.executeUpdate();
+                 pstmt3.executeUpdate();
                  ResultSet GeneratedKeys = pstmt2.getGeneratedKeys();
+                 GeneratedKeys.next();
                  tripid = GeneratedKeys.getInt(1);
-
+                 System.out.println(GeneratedKeys);
+                 conn.commit();
+                  
                 }
                 catch(SQLException e){
+                System.out.println(e);
                 System.out.println("[ERROR]: Cannot insert data!!");
+                conn.rollback();
 
                 }
                 System.out.println("Trip ID, Passenger name, Start");
