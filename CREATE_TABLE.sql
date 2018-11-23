@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS Vehicle(
-	id varchar(6) UNSIGNED NOT NULL,
+	id varchar(6) NOT NULL,
     model varchar(30) not null,
     model_year integer(4) unsigned not null,
     seats integer unsigned not null,
@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS Vehicle(
     );
 
 CREATE TABLE IF NOT EXISTS Driver(
-	id integer UNSIGNED NOT NULL,
+	id integer NOT NULL,
     name varchar(30) not null,
     vid varchar(6) not null,
     PRIMARY KEY(id),
@@ -17,12 +17,12 @@ CREATE TABLE IF NOT EXISTS Driver(
 
 
 CREATE TABLE IF NOT EXISTS Passenger(
-	id integer UNSIGNED primary key,
+	id integer primary key,
     name varchar(30) not null
     );
 
 CREATE TABLE IF NOT EXISTS Trip(
-	id integer UNSIGNED primary key AUTO_INCREMENT,
+	id integer primary key AUTO_INCREMENT,
     did integer unsigned,
     pid integer unsigned,
     start DATETIME not null,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS Trip(
     );
 
 CREATE TABLE IF NOT EXISTS Request(
-    id integer UNSIGNED primary key AUTO_INCREMENT,
+    id integer primary key AUTO_INCREMENT,
     pid integer unsigned,
     taken integer unsigned,
     model_year integer(4) unsigned,
